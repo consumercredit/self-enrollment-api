@@ -6,7 +6,7 @@ import express from 'express';
 dotenv.config();
 
 const db_user = process.env.DB_USER;
-const db_pass = process.env.DB_PASS;
+const db_pass = process.env.DB_PASSWORD;
 const db_server = process.env.DB_SERVER;
 const db_name = process.env.DB_NAME;
 
@@ -59,7 +59,7 @@ app.get('/test', async (req, res) => {
   } catch (err: any) {
     res.status(500).json({ error: 'Database error', details: err.message });
   }
-})
+});
 
 app.listen(port, () => {
   console.log(`Self Enrollment API listening on port ${port}`);

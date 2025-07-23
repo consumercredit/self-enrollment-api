@@ -2,6 +2,7 @@ import { TYPES } from 'tedious';
 import dotenv from 'dotenv';
 import knex from 'knex';
 import express from 'express';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -45,6 +46,11 @@ const app = express();
 app.use(express.json());
 const port = process.env.PORT || 3000;
 
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true // Optional: only if you're sending cookies or auth headers
+}));
+
 app.get('/', async (req, res) => {
   res.send('Hello World!');
 });
@@ -61,8 +67,18 @@ app.get('/test', async (req, res) => {
   }
 });
 
+app.post('/concerns-01-01', async (req, res) => {
+  const { ReferralID } = req.body;
+  try {
+    await db.raw('EXEC update_ClientContract @ClientID = ?, @ReferralID = ?', [10, ReferralID]);
+    res.status(201).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+
 app.listen(port, () => {
   console.log(`Self Enrollment API listening on port ${port}`);
 });
-
-export default db;

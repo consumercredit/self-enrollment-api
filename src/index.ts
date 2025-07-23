@@ -68,9 +68,10 @@ app.get('/test', async (req, res) => {
 });
 
 app.post('/concerns-01-01', async (req, res) => {
-  const { ReferralID } = req.body;
+  const { ReferralID, ReasonForContactID } = req.body;
   try {
     await db.raw('EXEC update_ClientContract @ClientID = ?, @ReferralID = ?', [10, ReferralID]);
+    await db.raw('EXEC update_ClientSession @ClientID = ?, @ReasonForContactID = ?', [10, ReasonForContactID]);
     res.status(201).json({ success: true });
   } catch (err: any) {
     console.error(err);

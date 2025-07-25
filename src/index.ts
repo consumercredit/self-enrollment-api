@@ -269,6 +269,211 @@ app.post('/concerns-01-03', async (req, res) => {
   }
 });
 
+app.post('/concerns-02-01', async (req, res) => {
+  const { financialPartner, peopleCount } = req.body;
+  try{
+    await db.raw(`EXEC update_ClientBudgetQuestions @ClientID = ?, @HasFinancialPartner = ?`, [10, financialPartner]);
+    await db.raw(`EXEC update_ClientDemographics @ClientID = ?, @NumOfPeopleFinancialResponsible = ?`, [10, peopleCount]);
+    res.status(201).json({ success: true });
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/concerns-02-01', async (req, res) => {
+  try {
+    const budget = await db('ClientBudgetQuestions')
+      .select('HasFinancialPartner as financialPartner')
+      .where('ClientID', 10)
+      .first();
+    const demo = await db('ClientDemographics')
+      .select('NumOfPeopleFinancialResponsible as peopleCount')
+      .where('ClientID', 10)
+      .first();
+    res.json({
+      financialPartner: budget?.financialPartner ?? null,
+      peopleCount: demo?.peopleCount ?? null
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.post('/concerns-03-01', async (req, res) => {
+  const { demoInfo } = req.body;
+  try {
+    await db.raw(
+      `EXEC update_ClientDemographics 
+        @ClientID = ?, 
+        @GenderID = ?, 
+        @MaritalStatusID = ?, 
+        @HeadOfFamily = ?, 
+        @NumberOfAdults = ?, 
+        @NumberOfChildren = ?, 
+        @NumOfPeopleInHousehold = ?`,
+      [
+        10,
+        demoInfo.gender,
+        demoInfo.maritalStatus,
+        demoInfo.headOfHousehold,
+        demoInfo.adults,
+        demoInfo.children,
+        demoInfo.adults + demoInfo.children + 1
+      ]
+    );
+    res.status(201).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/concerns-03-01', async (req, res) => {
+  try {
+    const result = await db('ClientDemographics')
+      .select(
+        'GenderID as gender',
+        'MaritalStatusID as maritalStatus',
+        'HeadOfFamily as headOfHousehold',
+        'NumberOfAdults as adults',
+        'NumberOfChildren as children'
+      )
+      .where('ClientID', 10)
+      .first();
+    
+    res.json(result || {});
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.post('/concerns-03-02', async (req, res) => {
+  const { demoInfo } = req.body;
+  try {
+    await db.raw(
+      `EXEC update_ClientEmployment 
+        @ClientID = ?, 
+        @OccupationID = ?, 
+        @ClientTypeOfWork = ?, 
+        @SelfWorkOnSideID = ?, 
+        @SelfEmployedBusinessAddressZipCode = ?,
+        @SelfEmployedNumberOfEmployees = ?,
+        @SelfEmployedYearsID = ?,
+        @SelfEmployedTypeOfBusinessID = ?,
+        @SelfEmployedTypeOfBusinessOther = ?,
+        @SelfGrossRevenueID = ?`,
+      [
+        10,
+        demoInfo.employment,
+        demoInfo.work,
+        demoInfo.sideWork,
+        demoInfo.sideWorkDetails?.zip ?? null,
+        demoInfo.sideWorkDetails?.employees ?? null,
+        demoInfo.sideWorkDetails?.yearsEmployed ?? null,
+        demoInfo.sideWorkDetails?.typeOfBusiness ?? null,
+        demoInfo.sideWorkDetails?.typeOfBusinessOther ?? null,
+        demoInfo.sideWorkDetails?.grossBusinessRevenue ?? null
+      ]
+    );
+    await db.raw(
+      `EXEC update_ClientDemographics @ClientID = ?, @MilitaryID = ?`,
+      [10, demoInfo.military]
+    );
+    // Use -1 as sentinel value to indicate "set to null" when planToLeaveMilitary is null
+    const transitionOutOfMilitaryValue = demoInfo.planToLeaveMilitary === null ? -1 : demoInfo.planToLeaveMilitary;
+    await db.raw(`EXEC update_ClientFlags @ClientID = ?, @TransitionOutOfMilitaryID = ?`, [10, transitionOutOfMilitaryValue]);
+    res.status(201).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/concerns-03-02', async (req, res) => {
+  try {
+    const result = await db('ClientEmployment')
+      .select(
+        'ClientEmployment.OccupationID as employment',
+        'ClientEmployment.ClientTypeOfWork as work',
+        'ClientEmployment.SelfWorkOnSideID as sideWork',
+        'ClientEmployment.SelfEmployedBusinessAddressZipCode as sideWorkZipCode',
+        'ClientEmployment.SelfEmployedNumberOfEmployees as sideWorkEmployees',
+        'ClientEmployment.SelfEmployedYearsID as sideWorkYearsEmployed',
+        'ClientEmployment.SelfEmployedTypeOfBusinessID as sideWorkTypeOfBusiness',
+        'ClientEmployment.SelfEmployedTypeOfBusinessOther as sideWorkTypeOfBusinessOther',
+        'ClientEmployment.SelfGrossRevenueID as sideWorkGrossRevenue',
+        'ClientDemographics.MilitaryID as military',
+        'ClientFlags.TransitionOutOfMilitaryID as planToLeaveMilitary'
+      )
+      .leftJoin('ClientDemographics', 'ClientEmployment.ClientID', 'ClientDemographics.ClientID')
+      .leftJoin('ClientFlags', 'ClientEmployment.ClientID', 'ClientFlags.ClientID')
+      .where('ClientEmployment.ClientID', 10)
+      .first();
+    
+    // Transform the flat structure back to nested sideWorkDetails
+    const transformedResult = result ? {
+      employment: result.employment,
+      work: result.work,
+      sideWork: result.sideWork,
+      sideWorkDetails: result.sideWork ? {
+        zip: result.sideWorkZipCode,
+        employees: result.sideWorkEmployees,
+        yearsEmployed: result.sideWorkYearsEmployed,
+        typeOfBusiness: result.sideWorkTypeOfBusiness,
+        typeOfBusinessOther: result.sideWorkTypeOfBusinessOther,
+        grossBusinessRevenue: result.sideWorkGrossRevenue
+      } : null,
+      military: result.military,
+      planToLeaveMilitary: result.planToLeaveMilitary
+    } : {};
+    
+    res.json(transformedResult);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.post('/concerns-03-03', async (req, res) => {
+  const { dateOfBirth, isHispanic, otherEducation, race, education } = req.body;
+  try {
+    await db.raw(
+      `EXEC update_ClientDemographics 
+        @ClientID = ?,
+        @HispanicID = ?, 
+        @EducationOther = ?, 
+        @RaceID = ?, 
+        @EducationLevelID = ?`,
+      [10, isHispanic, otherEducation, race, education]
+    );
+    await db.raw(`EXEC update_ClientProfile @ClientID = ?, @DOB = ?`, [10, dateOfBirth]);
+    res.status(201).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/concerns-03-03', async (req, res) => {
+  try {
+    const result = await db('ClientDemographics')
+      .join('ClientProfile', 'ClientDemographics.ProfileID', 'ClientProfile.ProfileID')
+      .select(
+        'ClientProfile.DOB as dateOfBirth',
+        'ClientDemographics.HispanicID as isHispanic',
+        'ClientDemographics.EducationOther as otherEducation',
+        'ClientDemographics.RaceID as race',
+        'ClientDemographics.EducationLevelID as education'
+      )
+      .where('ClientDemographics.ClientID', 10)
+      .first();
+    
+    res.json(result || {});
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Self Enrollment API listening on port ${port}`);
 });

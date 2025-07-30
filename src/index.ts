@@ -132,6 +132,24 @@ app.get('/refMilitary', async (req, res) => {
   }
 });
 
+app.get('/refRevenue', async (req, res) => {
+  try {
+    const result = await db.raw('EXEC get_refRevenue');
+    res.json(result || []);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/refTypeOfBusiness', async (req, res) => {
+  try {
+    const result = await db.raw('EXEC get_refTypeOfBusiness');
+    res.json(result || []);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.post('/concerns-01-01', async (req, res) => {
   const { HowDidYouHearAboutUsID, TypeOfDebtID, AmountOwedID, PaymentStatusID, PrimaryHardshipID, QualityOfLifeImpact } = req.body;
   try {
@@ -335,6 +353,69 @@ app.get('/concerns-03-01', async (req, res) => {
   try {
     const result = await db.raw('EXEC get_Demographics @ProfileID = ?', [1]);
     res.json(result[0]);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.post('/concerns-03-02', async (req, res) => {
+  const { demoInfo } = req.body;
+  try {
+    await db.raw(
+      `EXEC update_Employment 
+        @ProfileID = ?, 
+        @EmploymentID = ?, 
+        @TypeOfWork = ?, 
+        @DoesSideWork = ?, 
+        @MilitaryID = ?, 
+        @PlanToLeaveMilitary = ?`,
+      [
+        1,
+        demoInfo.employment,
+        demoInfo.work,
+        demoInfo.sideWork,
+        demoInfo.military,
+        demoInfo.planToLeaveMilitary
+      ]
+    );
+
+    if(demoInfo.sideWork){
+      await db.raw(
+        `EXEC update_SideWork 
+          @ProfileID = ?, 
+          @Zip = ?, 
+          @Employees = ?, 
+          @YearsEmployed = ?, 
+          @TypeOfBusinessID = ?, 
+          @RevenueID = ?,
+          @TypeOfBusinessOther = ?`,
+        [
+          1,
+          demoInfo.sideWorkDetails.zip,
+          demoInfo.sideWorkDetails.employees,
+          demoInfo.sideWorkDetails.yearsEmployed,
+          demoInfo.sideWorkDetails.typeOfBusiness,
+          demoInfo.sideWorkDetails.revenueID,
+          demoInfo.sideWorkDetails.typeOfBusinessOther
+        ]
+      );
+    }else{
+      await db.raw('EXEC delete_SideWork @ProfileID = ?', [1]);
+    }
+    
+    res.status(201).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/concerns-03-02', async (req, res) => {
+  try {
+    const employment = await db.raw('EXEC get_Employment @ProfileID = ?', [1]);
+    const sidework = await db.raw('EXEC get_SideWork @ProfileID = ?', [1]);
+    res.json({ employment: employment[0], sidework: sidework[0] });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });

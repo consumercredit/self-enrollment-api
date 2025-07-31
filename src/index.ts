@@ -150,6 +150,33 @@ app.get('/refTypeOfBusiness', async (req, res) => {
   }
 });
 
+app.get('/refEducation', async (req, res) => {
+  try {
+    const result = await db.raw('EXEC get_refEducation');
+    res.json(result || []);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/refRace', async (req, res) => {
+  try {
+    const result = await db.raw('EXEC get_refRace');
+    res.json(result || []);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/refHousingStatus', async (req, res) => {
+  try {
+    const result = await db.raw('EXEC get_refHousingStatus');
+    res.json(result || []);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.post('/concerns-01-01', async (req, res) => {
   const { HowDidYouHearAboutUsID, TypeOfDebtID, AmountOwedID, PaymentStatusID, PrimaryHardshipID, QualityOfLifeImpact } = req.body;
   try {
@@ -416,6 +443,149 @@ app.get('/concerns-03-02', async (req, res) => {
     const employment = await db.raw('EXEC get_Employment @ProfileID = ?', [1]);
     const sidework = await db.raw('EXEC get_SideWork @ProfileID = ?', [1]);
     res.json({ employment: employment[0], sidework: sidework[0] });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.post('/concerns-03-03', async (req, res) => {
+  const {EducationID, OtherEducation, RaceID, IsHispanic, DateOfBirth} = req.body;
+  try{
+    await db.raw(
+      `EXEC update_Demographics 
+        @ProfileID = ?, 
+        @EducationID = ?, 
+        @OtherEducation = ?, 
+        @RaceID = ?, 
+        @IsHispanic = ?`,
+      [1, EducationID, OtherEducation, RaceID, IsHispanic]
+    );
+    await db.raw('EXEC update_Profile @ProfileID = ?, @DateOfBirth = ?', [1, DateOfBirth]);
+    res.status(201).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/concerns-03-03', async (req, res) => {
+  try{
+    const demographics = await db.raw('EXEC get_Demographics @ProfileID = ?', [1]);
+    const profile = await db.raw('EXEC get_Profile @ProfileID = ?', [1]);
+    res.json({ demographics: demographics[0], profile: profile[0] });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.post('/concerns-03-04', async (req, res) => {
+  const {HousingID, OtherHousing, IsProficientInEnglish, LivesInRuralArea, HasFiledForBankruptcy, YearsUntilRetirement} = req.body;
+  try{
+    await db.raw(
+      `EXEC update_Demographics 
+        @ProfileID = ?, 
+        @HousingID = ?, 
+        @OtherHousing = ?, 
+        @IsProficientInEnglish = ?, 
+        @LivesInRuralArea = ?,
+        @HasFiledForBankruptcy = ?,
+        @YearsUntilRetirement = ?`,
+      [1, HousingID, OtherHousing, IsProficientInEnglish, LivesInRuralArea, HasFiledForBankruptcy, YearsUntilRetirement]
+    );
+    res.status(201).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/concerns-03-04', async (req, res) => {
+  try{
+    const result = await db.raw('EXEC get_Demographics @ProfileID = ?', [1]);
+    res.json(result[0]);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.post('/concerns-03-05', async (req, res) => {
+  const {ConsentToTexts, CanShareInfo, Phone} = req.body;
+  try{
+    await db.raw(
+      `EXEC update_Demographics 
+        @ProfileID = ?,
+        @CanShareInfo = ?`,
+      [1, CanShareInfo]
+    );
+    await db.raw('EXEC update_Profile @ProfileID = ?, @ConsentToTexts = ?, @Phone = ?', [1, ConsentToTexts, Phone]);
+    res.status(201).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/concerns-03-05', async (req, res) => {
+  try{
+    const demographics = await db.raw('EXEC get_Demographics @ProfileID = ?', [1]);
+    const profile = await db.raw('EXEC get_Profile @ProfileID = ?', [1]);
+    res.json({demographics: demographics[0], profile: profile[0]});
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.post('/concerns-04-01', async (req, res) => {
+  const {budgetItems} = req.body;
+  try{
+    await db.raw(
+      `EXEC update_Goals 
+        @ProfileID = ?,
+        @PurchaseHome = ?,
+        @SaveForRetirement = ?,
+        @ContinueEducation = ?,
+        @HaveEmergencySavings = ?,
+        @FinanceChildsEducation = ?,
+        @PayOffCollegeLoans = ?,
+        @MakeHomeImprovements = ?,
+        @BuyVacationHome = ?,
+        @PurchaseNewVehicle = ?,
+        @SavingForFuneral = ?,
+        @HaveLifeInsurance = ?,
+        @PayOffMortgage = ?,
+        @Other = ?`,
+      [
+        1,
+        budgetItems.PurchaseHome,
+        budgetItems.SaveForRetirement,
+        budgetItems.ContinueEducation,
+        budgetItems.HaveEmergencySavings,
+        budgetItems.FinanceChildsEducation,
+        budgetItems.PayOffCollegeLoans,
+        budgetItems.MakeHomeImprovements,
+        budgetItems.BuyVacationHome,
+        budgetItems.PurchaseNewVehicle,
+        budgetItems.SavingForFuneral,
+        budgetItems.HaveLifeInsurance,
+        budgetItems.PayOffMortgage,
+        budgetItems.Other
+      ]
+    );
+    res.status(201).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/concerns-04-01', async (req, res) => {
+  try{
+    const result = await db.raw('EXEC get_Goals @ProfileID = ?', [1]);
+    res.json(result[0]);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });

@@ -592,6 +592,61 @@ app.get('/concerns-04-01', async (req, res) => {
   }
 });
 
+app.post('/concerns-05-01', async (req, res) => {
+  const {spendingHabits} = req.body;
+  try{
+    await db.raw(
+      `EXEC update_Habits 
+        @ProfileID = ?,
+        @OnlyWorryAboutToday = ?,
+        @KeepUpWithJoneses = ?,
+        @BuyBasedOnNeeds = ?,
+        @InfluencedBySuggestions = ?,
+        @ShoppingMakesMeFeelBetter = ?,
+        @BuyOnImpulse = ?,
+        @SpendToRetaliate = ?,
+        @CreditCardsToSupplementIncome = ?,
+        @Other = ?`,
+      [
+        1,
+        spendingHabits.OnlyWorryAboutToday,
+        spendingHabits.KeepUpWithJoneses,
+        spendingHabits.BuyBasedOnNeeds,
+        spendingHabits.InfluencedBySuggestions,
+        spendingHabits.ShoppingMakesMeFeelBetter,
+        spendingHabits.BuyOnImpulse,
+        spendingHabits.SpendToRetaliate,
+        spendingHabits.CreditCardsToSupplementIncome,
+        spendingHabits.Other
+      ]
+    );
+    res.status(201).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/concerns-05-01', async (req, res) => {
+  try{
+    const result = await db.raw('EXEC get_Habits @ProfileID = ?', [1]);
+    res.json(result[0]);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/income-01-01', async (req, res) => {
+  try{
+    const result = await db.raw('EXEC get_Profile @ProfileID = ?', [1]);
+    res.json(result[0]);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Self Enrollment API listening on port ${port}`);
 });

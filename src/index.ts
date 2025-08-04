@@ -177,6 +177,24 @@ app.get('/refHousingStatus', async (req, res) => {
   }
 });
 
+app.get('/refPayPeriod', async (req, res) => {
+  try {
+    const result = await db.raw('EXEC get_refPayPeriod');
+    res.json(result || []);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/refHowLongUseSavingsPeriod', async (req, res) => {
+  try {
+    const result = await db.raw('EXEC get_refHowLongUseSavingsPeriod');
+    res.json(result || []);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.post('/concerns-01-01', async (req, res) => {
   const { HowDidYouHearAboutUsID, TypeOfDebtID, AmountOwedID, PaymentStatusID, PrimaryHardshipID, QualityOfLifeImpact } = req.body;
   try {
@@ -646,6 +664,51 @@ app.get('/income-01-01', async (req, res) => {
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });
+
+app.post('/income-01-01', async (req, res) => {
+  const {
+    hasIncome,
+    hasSavings,
+    yourIncome,
+    yourPartnersIncome,
+    yourSavingsIncome
+  } = req.body;
+
+  try {
+    await db.raw(
+      `EXEC update_YourIncome 
+        @ProfileID = ?, 
+        @PayPeriodID = ?, 
+        @GrossIncome = ?, 
+        @NetIncome = ?, 
+        @OtherDeductions = ?, 
+        @WagesGarnished = ?, 
+        @DoYouHaveIncome = ?, 
+        @DoYouHaveSavings = ?, 
+        @HowLongUseSavings = ?, 
+        @HowLongUseSavingsPeriodID = ?,
+        @SavingsAmount = ?`,
+      [
+        1,
+        yourIncome.PayPeriodID,
+        yourIncome.GrossIncome,
+        yourIncome.NetIncome,
+        yourIncome.OtherDeductions,
+        hasIncome,
+        hasSavings,
+        yourSavingsIncome.HowLongUseSavings,
+        yourSavingsIncome.HowLongUseSavingsPeriodID,
+        yourSavingsIncome.SavingsAmount
+      ]
+    );
+
+    res.status(200).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Self Enrollment API listening on port ${port}`);

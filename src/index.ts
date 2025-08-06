@@ -657,8 +657,11 @@ app.get('/concerns-05-01', async (req, res) => {
 
 app.get('/income-01-01', async (req, res) => {
   try{
-    const result = await db.raw('EXEC get_Profile @ProfileID = ?', [1]);
-    res.json(result[0]);
+    const profile = await db.raw('EXEC get_Profile @ProfileID = ?', [1]);
+    const yourIncome = await db.raw('EXEC get_YourIncome @ProfileID = ?', [1]);
+    const yourPartnersIncome = await db.raw('EXEC get_YourPartnersIncome @ProfileID = ?', [1]);
+    const yourSavingsIncome = await db.raw('EXEC get_YourSavingsIncome @ProfileID = ?', [1]);
+    res.json({profile: profile[0], yourIncome: yourIncome[0], yourPartnersIncome: yourPartnersIncome[0], yourSavingsIncome: yourSavingsIncome[0]});
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -667,8 +670,9 @@ app.get('/income-01-01', async (req, res) => {
 
 app.post('/income-01-01', async (req, res) => {
   const {
-    hasIncome,
-    hasSavings,
+    DoYouHaveIncome,
+    DoYouHaveSavings,
+    HasPartner,
     yourIncome,
     yourPartnersIncome,
     yourSavingsIncome
@@ -676,31 +680,74 @@ app.post('/income-01-01', async (req, res) => {
 
   try {
     await db.raw(
-      `EXEC update_YourIncome 
-        @ProfileID = ?, 
-        @PayPeriodID = ?, 
-        @GrossIncome = ?, 
-        @NetIncome = ?, 
-        @OtherDeductions = ?, 
-        @WagesGarnished = ?, 
-        @DoYouHaveIncome = ?, 
-        @DoYouHaveSavings = ?, 
-        @HowLongUseSavings = ?, 
-        @HowLongUseSavingsPeriodID = ?,
-        @SavingsAmount = ?`,
+      `EXEC update_Profile
+        @ProfileID = ?,
+        @DoYouHaveIncome = ?,
+        @DoYouHaveSavings = ?`,
       [
         1,
-        yourIncome.PayPeriodID,
-        yourIncome.GrossIncome,
-        yourIncome.NetIncome,
-        yourIncome.OtherDeductions,
-        hasIncome,
-        hasSavings,
-        yourSavingsIncome.HowLongUseSavings,
-        yourSavingsIncome.HowLongUseSavingsPeriodID,
-        yourSavingsIncome.SavingsAmount
+        DoYouHaveIncome,
+        DoYouHaveSavings
       ]
     );
+
+    if(DoYouHaveIncome){
+      await db.raw(
+        `EXEC update_YourIncome 
+          @ProfileID = ?, 
+          @PayPeriodID = ?, 
+          @GrossIncome = ?, 
+          @NetIncome = ?, 
+          @OtherDeductions = ?, 
+          @WagesGarnished = ?,
+          @PayrollDeductions = ?`,
+        [
+          1,
+          yourIncome.PayPeriodID,
+          yourIncome.GrossIncome,
+          yourIncome.NetIncome,
+          yourIncome.OtherDeductions,
+          yourIncome.WagesGarnished,
+          yourIncome.PayrollDeductions
+        ]
+      );
+    }
+
+    if(HasPartner){
+      await db.raw(
+        `EXEC update_YourPartnersIncome 
+        @ProfileID = ?,
+        @PayPeriodID = ?,
+        @GrossIncome = ?,
+        @NetIncome = ?,
+        @PayrollDeductions = ?`, 
+        [
+          1, 
+          yourPartnersIncome.PayPeriodID,
+          yourPartnersIncome.GrossIncome,
+          yourPartnersIncome.NetIncome,
+          yourPartnersIncome.PayrollDeductions
+        ]
+      );
+    }
+
+    if(DoYouHaveSavings){
+      await db.raw(
+        `EXEC update_YourSavingsIncome 
+          @ProfileID = ?,
+          @HowLongUseSavings = ?,
+          @HowLongUseSavingsPeriodID = ?,
+          @SavingsAmount = ?,
+          @GrossMonthlySavingsIncome = ?`,
+        [
+          1,
+          yourSavingsIncome.HowLongUseSavings,
+          yourSavingsIncome.HowLongUseSavingsPeriodID,
+          yourSavingsIncome.SavingsAmount,
+          yourSavingsIncome.GrossMonthlySavingsIncome
+        ]
+      );
+    }
 
     res.status(200).json({ success: true });
   } catch (err: any) {
@@ -709,6 +756,18 @@ app.post('/income-01-01', async (req, res) => {
   }
 });
 
+app.get('/income-02-01/grossEmploymentIncome_Monthly', async (req, res) => {
+  try{
+    const profile = await db.raw('EXEC get_Profile @ProfileID = ?', [1]);
+    const yourIncome = await db.raw('EXEC get_YourIncome @ProfileID = ?', [1]);
+    const yourPartnersIncome = await db.raw('EXEC get_YourPartnersIncome @ProfileID = ?', [1]);
+    const yourSavingsIncome = await db.raw('EXEC get_YourSavingsIncome @ProfileID = ?', [1]);
+    res.json({profile: profile[0], yourIncome: yourIncome[0], yourPartnersIncome: yourPartnersIncome[0], yourSavingsIncome: yourSavingsIncome[0]});
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Self Enrollment API listening on port ${port}`);

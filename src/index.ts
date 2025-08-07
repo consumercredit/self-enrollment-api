@@ -195,6 +195,33 @@ app.get('/refHowLongUseSavingsPeriod', async (req, res) => {
   }
 });
 
+app.get('/refSecuredDebtStatus', async (req, res) => {
+  try{
+    const result = await db.raw('EXEC get_refSecuredDebtStatus');
+    res.json(result || []);
+  }catch(err: any){
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/refSecuredDebtAccountHolder', async (req, res) => {
+  try{
+    const result = await db.raw('EXEC get_refSecuredDebtAccountHolder');
+    res.json(result || []);
+  }catch(err: any){
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/refSecuredDebtType', async (req, res) => {
+  try{
+    const result = await db.raw('EXEC get_refSecuredDebtType');
+    res.json(result || []);
+  }catch(err: any){
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.post('/concerns-01-01', async (req, res) => {
   const { HowDidYouHearAboutUsID, TypeOfDebtID, AmountOwedID, PaymentStatusID, PrimaryHardshipID, QualityOfLifeImpact } = req.body;
   try {
@@ -445,8 +472,6 @@ app.post('/concerns-03-02', async (req, res) => {
           demoInfo.sideWorkDetails.typeOfBusinessOther
         ]
       );
-    }else{
-      await db.raw('EXEC delete_SideWork @ProfileID = ?', [1]);
     }
     
     res.status(201).json({ success: true });
@@ -756,13 +781,57 @@ app.post('/income-01-01', async (req, res) => {
   }
 });
 
-app.get('/income-02-01/grossEmploymentIncome_Monthly', async (req, res) => {
+app.get('/income-02-01/incomes', async (req, res) => {
   try{
     const profile = await db.raw('EXEC get_Profile @ProfileID = ?', [1]);
     const yourIncome = await db.raw('EXEC get_YourIncome @ProfileID = ?', [1]);
     const yourPartnersIncome = await db.raw('EXEC get_YourPartnersIncome @ProfileID = ?', [1]);
     const yourSavingsIncome = await db.raw('EXEC get_YourSavingsIncome @ProfileID = ?', [1]);
     res.json({profile: profile[0], yourIncome: yourIncome[0], yourPartnersIncome: yourPartnersIncome[0], yourSavingsIncome: yourSavingsIncome[0]});
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/income-02-01', async (req, res) => {
+  try{
+    const result = await db.raw('EXEC get_OtherIncome @ProfileID = ?', [1]);
+    res.json(result);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.post('/income-02-01', async (req, res) => {
+  const { incomeItems } = req.body;
+
+  if (!Array.isArray(incomeItems)) {
+    return res.status(400).json({ error: 'incomeItems must be an array' });
+  }
+
+  try {
+    for (const item of incomeItems) {
+      await db.raw(
+        `EXEC insert_OtherIncome 
+          @ProfileID = ?,
+          @Section = ?, 
+          @PayPeriodID = ?, 
+          @Amount = ?`,
+        [
+          1,
+          item.Section,
+          item.PayPeriodID,
+          item.Amount
+        ]
+      );
+    }
+
+    res.status(201).json({ 
+      success: true, 
+      insertedCount: incomeItems.length 
+    });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });

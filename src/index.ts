@@ -222,6 +222,16 @@ app.get('/refSecuredDebtType', async (req, res) => {
   }
 });
 
+app.post('/refSecuredDebtType/TypeName', async (req, res) => {
+  const { TypeID } = req.body;
+  try{
+    const result = await db.raw('EXEC get_refSecuredDebtType_TypeName_By_ID @TypeID = ?', [TypeID]);
+    res.json(result[0] || []);
+  }catch(err: any){
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.post('/concerns-01-01', async (req, res) => {
   const { HowDidYouHearAboutUsID, TypeOfDebtID, AmountOwedID, PaymentStatusID, PrimaryHardshipID, QualityOfLifeImpact } = req.body;
   try {

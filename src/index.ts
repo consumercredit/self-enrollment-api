@@ -196,38 +196,47 @@ app.get('/refHowLongUseSavingsPeriod', async (req, res) => {
 });
 
 app.get('/refSecuredDebtStatus', async (req, res) => {
-  try{
+  try {
     const result = await db.raw('EXEC get_refSecuredDebtStatus');
     res.json(result || []);
-  }catch(err: any){
+  } catch (err: any) {
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });
 
 app.get('/refSecuredDebtAccountHolder', async (req, res) => {
-  try{
+  try {
     const result = await db.raw('EXEC get_refSecuredDebtAccountHolder');
     res.json(result || []);
-  }catch(err: any){
+  } catch (err: any) {
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });
 
 app.get('/refSecuredDebtType', async (req, res) => {
-  try{
+  try {
     const result = await db.raw('EXEC get_refSecuredDebtType');
     res.json(result || []);
-  }catch(err: any){
+  } catch (err: any) {
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });
 
 app.post('/refSecuredDebtType/TypeName', async (req, res) => {
   const { TypeID } = req.body;
-  try{
+  try {
     const result = await db.raw('EXEC get_refSecuredDebtType_TypeName_By_ID @TypeID = ?', [TypeID]);
     res.json(result[0] || []);
-  }catch(err: any){
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/refLivingArrangement', async (req, res) => {
+  try {
+    const result = await db.raw('EXEC get_refLivingArrangement');
+    res.json(result || []);
+  } catch (err: any) {
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });
@@ -367,7 +376,7 @@ app.post('/concerns-01-03', async (req, res) => {
         waysToOvercome.other,
         waysToOvercome.otherDescription
       ]
-    );    
+    );
     res.status(201).json({ success: true });
   } catch (err: any) {
     console.error(err);
@@ -423,7 +432,7 @@ app.post('/concerns-03-01', async (req, res) => {
         @TotalPeopleInHousehold = ?`,
       [1, demoInfo.genderID, demoInfo.maritalID, demoInfo.headOfHousehold, demoInfo.adults, demoInfo.children, demoInfo.adults + demoInfo.children + 1]
     );
-    
+
     res.status(201).json({ success: true });
   } catch (err: any) {
     console.error(err);
@@ -462,7 +471,7 @@ app.post('/concerns-03-02', async (req, res) => {
       ]
     );
 
-    if(demoInfo.sideWork){
+    if (demoInfo.sideWork) {
       await db.raw(
         `EXEC update_SideWork 
           @ProfileID = ?, 
@@ -483,7 +492,7 @@ app.post('/concerns-03-02', async (req, res) => {
         ]
       );
     }
-    
+
     res.status(201).json({ success: true });
   } catch (err: any) {
     console.error(err);
@@ -503,8 +512,8 @@ app.get('/concerns-03-02', async (req, res) => {
 });
 
 app.post('/concerns-03-03', async (req, res) => {
-  const {EducationID, OtherEducation, RaceID, IsHispanic, DateOfBirth} = req.body;
-  try{
+  const { EducationID, OtherEducation, RaceID, IsHispanic, DateOfBirth } = req.body;
+  try {
     await db.raw(
       `EXEC update_Demographics 
         @ProfileID = ?, 
@@ -523,7 +532,7 @@ app.post('/concerns-03-03', async (req, res) => {
 });
 
 app.get('/concerns-03-03', async (req, res) => {
-  try{
+  try {
     const demographics = await db.raw('EXEC get_Demographics @ProfileID = ?', [1]);
     const profile = await db.raw('EXEC get_Profile @ProfileID = ?', [1]);
     res.json({ demographics: demographics[0], profile: profile[0] });
@@ -534,8 +543,8 @@ app.get('/concerns-03-03', async (req, res) => {
 });
 
 app.post('/concerns-03-04', async (req, res) => {
-  const {HousingID, OtherHousing, IsProficientInEnglish, LivesInRuralArea, HasFiledForBankruptcy, YearsUntilRetirement} = req.body;
-  try{
+  const { HousingID, OtherHousing, IsProficientInEnglish, LivesInRuralArea, HasFiledForBankruptcy, YearsUntilRetirement } = req.body;
+  try {
     await db.raw(
       `EXEC update_Demographics 
         @ProfileID = ?, 
@@ -555,7 +564,7 @@ app.post('/concerns-03-04', async (req, res) => {
 });
 
 app.get('/concerns-03-04', async (req, res) => {
-  try{
+  try {
     const result = await db.raw('EXEC get_Demographics @ProfileID = ?', [1]);
     res.json(result[0]);
   } catch (err: any) {
@@ -565,8 +574,8 @@ app.get('/concerns-03-04', async (req, res) => {
 });
 
 app.post('/concerns-03-05', async (req, res) => {
-  const {ConsentToTexts, CanShareInfo, Phone} = req.body;
-  try{
+  const { ConsentToTexts, CanShareInfo, Phone } = req.body;
+  try {
     await db.raw(
       `EXEC update_Demographics 
         @ProfileID = ?,
@@ -582,10 +591,10 @@ app.post('/concerns-03-05', async (req, res) => {
 });
 
 app.get('/concerns-03-05', async (req, res) => {
-  try{
+  try {
     const demographics = await db.raw('EXEC get_Demographics @ProfileID = ?', [1]);
     const profile = await db.raw('EXEC get_Profile @ProfileID = ?', [1]);
-    res.json({demographics: demographics[0], profile: profile[0]});
+    res.json({ demographics: demographics[0], profile: profile[0] });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -593,8 +602,8 @@ app.get('/concerns-03-05', async (req, res) => {
 });
 
 app.post('/concerns-04-01', async (req, res) => {
-  const {budgetItems} = req.body;
-  try{
+  const { budgetItems } = req.body;
+  try {
     await db.raw(
       `EXEC update_Goals 
         @ProfileID = ?,
@@ -636,7 +645,7 @@ app.post('/concerns-04-01', async (req, res) => {
 });
 
 app.get('/concerns-04-01', async (req, res) => {
-  try{
+  try {
     const result = await db.raw('EXEC get_Goals @ProfileID = ?', [1]);
     res.json(result[0]);
   } catch (err: any) {
@@ -646,8 +655,8 @@ app.get('/concerns-04-01', async (req, res) => {
 });
 
 app.post('/concerns-05-01', async (req, res) => {
-  const {spendingHabits} = req.body;
-  try{
+  const { spendingHabits } = req.body;
+  try {
     await db.raw(
       `EXEC update_Habits 
         @ProfileID = ?,
@@ -681,7 +690,7 @@ app.post('/concerns-05-01', async (req, res) => {
 });
 
 app.get('/concerns-05-01', async (req, res) => {
-  try{
+  try {
     const result = await db.raw('EXEC get_Habits @ProfileID = ?', [1]);
     res.json(result[0]);
   } catch (err: any) {
@@ -691,12 +700,12 @@ app.get('/concerns-05-01', async (req, res) => {
 });
 
 app.get('/income-01-01', async (req, res) => {
-  try{
+  try {
     const profile = await db.raw('EXEC get_Profile @ProfileID = ?', [1]);
     const yourIncome = await db.raw('EXEC get_YourIncome @ProfileID = ?', [1]);
     const yourPartnersIncome = await db.raw('EXEC get_YourPartnersIncome @ProfileID = ?', [1]);
     const yourSavingsIncome = await db.raw('EXEC get_YourSavingsIncome @ProfileID = ?', [1]);
-    res.json({profile: profile[0], yourIncome: yourIncome[0], yourPartnersIncome: yourPartnersIncome[0], yourSavingsIncome: yourSavingsIncome[0]});
+    res.json({ profile: profile[0], yourIncome: yourIncome[0], yourPartnersIncome: yourPartnersIncome[0], yourSavingsIncome: yourSavingsIncome[0] });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -726,7 +735,7 @@ app.post('/income-01-01', async (req, res) => {
       ]
     );
 
-    if(DoYouHaveIncome){
+    if (DoYouHaveIncome) {
       await db.raw(
         `EXEC update_YourIncome 
           @ProfileID = ?, 
@@ -748,16 +757,16 @@ app.post('/income-01-01', async (req, res) => {
       );
     }
 
-    if(HasPartner){
+    if (HasPartner) {
       await db.raw(
         `EXEC update_YourPartnersIncome 
         @ProfileID = ?,
         @PayPeriodID = ?,
         @GrossIncome = ?,
         @NetIncome = ?,
-        @PayrollDeductions = ?`, 
+        @PayrollDeductions = ?`,
         [
-          1, 
+          1,
           yourPartnersIncome.PayPeriodID,
           yourPartnersIncome.GrossIncome,
           yourPartnersIncome.NetIncome,
@@ -766,7 +775,7 @@ app.post('/income-01-01', async (req, res) => {
       );
     }
 
-    if(DoYouHaveSavings){
+    if (DoYouHaveSavings) {
       await db.raw(
         `EXEC update_YourSavingsIncome 
           @ProfileID = ?,
@@ -792,12 +801,12 @@ app.post('/income-01-01', async (req, res) => {
 });
 
 app.get('/income-02-01/incomes', async (req, res) => {
-  try{
+  try {
     const profile = await db.raw('EXEC get_Profile @ProfileID = ?', [1]);
     const yourIncome = await db.raw('EXEC get_YourIncome @ProfileID = ?', [1]);
     const yourPartnersIncome = await db.raw('EXEC get_YourPartnersIncome @ProfileID = ?', [1]);
     const yourSavingsIncome = await db.raw('EXEC get_YourSavingsIncome @ProfileID = ?', [1]);
-    res.json({profile: profile[0], yourIncome: yourIncome[0], yourPartnersIncome: yourPartnersIncome[0], yourSavingsIncome: yourSavingsIncome[0]});
+    res.json({ profile: profile[0], yourIncome: yourIncome[0], yourPartnersIncome: yourPartnersIncome[0], yourSavingsIncome: yourSavingsIncome[0] });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -805,7 +814,7 @@ app.get('/income-02-01/incomes', async (req, res) => {
 });
 
 app.get('/income-02-01', async (req, res) => {
-  try{
+  try {
     const result = await db.raw('EXEC get_OtherIncome @ProfileID = ?', [1]);
     res.json(result);
   } catch (err: any) {
@@ -838,11 +847,128 @@ app.post('/income-02-01', async (req, res) => {
       );
     }
 
-    res.status(201).json({ 
-      success: true, 
-      insertedCount: incomeItems.length 
+    res.status(201).json({
+      success: true,
+      insertedCount: incomeItems.length
     });
   } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.post('/expenses-01-01/insert', async (req, res) => {
+  const { TypeID, MonthlyPayment, AccountHolderID, StatusID, CurrentValue, BalanceOwed } = req.body;
+  try {
+    await db.raw(
+      `EXEC insert_SecuredDebt 
+        @ProfileID = ?, 
+        @TypeID = ?, 
+        @MonthlyPayment = ?, 
+        @AccountHolderID = ?, 
+        @StatusID = ?, 
+        @CurrentValue = ?, 
+        @BalanceOwed = ?`,
+      [
+        1,
+        TypeID,
+        MonthlyPayment,
+        AccountHolderID,
+        StatusID,
+        CurrentValue,
+        BalanceOwed
+      ]
+    );
+    const RowID = await db.raw('select MAX(RowID) as NewRowID from SecuredDebt where ProfileID = ?', [1]);
+    res.status(201).json(RowID[0]);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.delete('/expenses-01-01/delete', async (req, res) => {
+  const { RowID } = req.body;
+  try{
+    await db.raw(`EXEC delete_SecuredDebt @RowID = ?`, [RowID]);
+    res.status(201).json({ success: true });
+  } catch(err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.put('/expenses-01-01/update', async (req, res) => {
+  const { RowID, TypeID, MonthlyPayment, AccountHolderID, StatusID, CurrentValue, BalanceOwed } = req.body;
+  try{
+    await db.raw(
+      `EXEC update_SecuredDebt 
+      @RowID = ?,
+      @TypeID = ?,
+      @MonthlyPayment = ?,
+      @AccountHolderID = ?,
+      @StatusID = ?,
+      @CurrentValue = ?,
+      @BalanceOwed = ?`, 
+      [
+        RowID,
+        TypeID,
+        MonthlyPayment,
+        AccountHolderID,
+        StatusID,
+        CurrentValue,
+        BalanceOwed
+      ]
+    );
+    res.status(201).json({ success: true });
+  } catch(err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/expenses-01-01', async (req, res) => {
+  try{
+    const data = await db.raw(`EXEC get_SecuredDebt @ProfileID = ?`, [1]);
+    res.status(201).json(data);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.post('/expenses-02-01', async (req, res) => {
+  const { Section, PayPeriodID, Amount, Comment, LivingArrangementID } = req.body;
+  try{
+    await db.raw(`EXEC update_Demographics @ProfileID = ?, @LivingArrangementID = ?`, [1, LivingArrangementID]);
+    await db.raw(
+      `EXEC insert_Expenses 
+      @ProfileID = ?,
+      @Section = ?,
+      @PayPeriodID = ?,
+      @Amount = ?,
+      @Comment = ?`,
+      [
+        1,
+        Section,
+        PayPeriodID,
+        Amount,
+        Comment
+      ]
+    );
+    res.status(201).json({ success: true });
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/expenses-02-01', async (req, res) => {
+  try{
+    const expenses = await db.raw(`EXEC get_Expenses @ProfileID = ?`, [1]);
+    const demographics = await db.raw(`EXEC get_Demographics @ProfileID = ?`, [1]);
+    res.status(201).json({expenses, demographics});
+  }catch(err: any){
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }

@@ -430,7 +430,7 @@ app.post('/concerns-03-01', async (req, res) => {
         @Adults = ?, 
         @Children = ?,
         @TotalPeopleInHousehold = ?`,
-      [1, demoInfo.genderID, demoInfo.maritalID, demoInfo.headOfHousehold, demoInfo.adults, demoInfo.children, demoInfo.adults + demoInfo.children + 1]
+      [1, demoInfo.genderID, demoInfo.maritalID, demoInfo.headOfHousehold, demoInfo.adults, demoInfo.children, demoInfo.adults + demoInfo.children]
     );
 
     res.status(201).json({ success: true });
@@ -970,6 +970,83 @@ app.get('/expenses-02-01', async (req, res) => {
     const expenses = await db.raw(`EXEC get_Expenses @ProfileID = ?`, [1]);
     const demographics = await db.raw(`EXEC get_Demographics @ProfileID = ?`, [1]);
     res.status(201).json({ expenses: expenses, demographics: demographics[0] });
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/expenses-03-01', async (req, res) => {
+  try{
+    const demographics = await db.raw(`SELECT TotalPeopleInHousehold from Demographics where ProfileID = ?`, [1]);
+    const expenses = await db.raw(`EXEC get_Expenses @ProfileID = ?`, [1]);
+    res.status(201).json({demographics: demographics[0], expenses: expenses});
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.post('/expenses-03-01', async (req, res) => {
+  const { expenses } = req.body;
+  try{
+    for (const exp of expenses) {
+      await db.raw(
+        `EXEC insert_Expenses 
+          @ProfileID = ?,
+          @Section = ?, 
+          @PayPeriodID = ?, 
+          @Amount = ?,
+          @Comment = ?`,
+        [
+          1,
+          exp.Section,
+          exp.PayPeriodID,
+          exp.Amount,
+          exp.Comment
+        ]
+      );
+    }
+    res.status(201).json({ success: true });
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/expenses-04-01', async (req, res) => {
+  try{
+    const demographics = await db.raw(`EXEC get_Demographics @ProfileID = ?`, [1]);
+    const expenses = await db.raw(`EXEC get_Expenses @ProfileID = ?`, [1]);
+    res.status(201).json({demographics: demographics[0], expenses: expenses});
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.post('/expenses-04-01', async (req, res) => {
+  const { expenses, adults, children } = req.body;
+  try{
+    for (const exp of expenses) {
+      await db.raw(
+        `EXEC insert_Expenses 
+          @ProfileID = ?,
+          @Section = ?, 
+          @PayPeriodID = ?, 
+          @Amount = ?,
+          @Comment = ?`,
+        [
+          1,
+          exp.Section,
+          exp.PayPeriodID,
+          exp.Amount,
+          exp.Comment
+        ]
+      );
+    }
+    await db.raw(`EXEC update_Demographics @ProfileID = ?, @Adults = ?, @Children = ?`, [1, adults, children]);
+    res.status(201).json({ success: true });
   }catch(err: any){
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });

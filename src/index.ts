@@ -938,24 +938,26 @@ app.get('/expenses-01-01', async (req, res) => {
 });
 
 app.post('/expenses-02-01', async (req, res) => {
-  const { Section, PayPeriodID, Amount, Comment, LivingArrangementID } = req.body;
+  const { expenses, LivingArrangementID } = req.body;
   try{
     await db.raw(`EXEC update_Demographics @ProfileID = ?, @LivingArrangementID = ?`, [1, LivingArrangementID]);
-    await db.raw(
-      `EXEC insert_Expenses 
-      @ProfileID = ?,
-      @Section = ?,
-      @PayPeriodID = ?,
-      @Amount = ?,
-      @Comment = ?`,
-      [
-        1,
-        Section,
-        PayPeriodID,
-        Amount,
-        Comment
-      ]
-    );
+    for (const exp of expenses) {
+      await db.raw(
+        `EXEC insert_Expenses 
+          @ProfileID = ?,
+          @Section = ?, 
+          @PayPeriodID = ?, 
+          @Amount = ?,
+          @Comment = ?`,
+        [
+          1,
+          exp.Section,
+          exp.PayPeriodID,
+          exp.Amount,
+          exp.Comment
+        ]
+      );
+    }
     res.status(201).json({ success: true });
   }catch(err: any){
     console.error(err);
@@ -967,7 +969,7 @@ app.get('/expenses-02-01', async (req, res) => {
   try{
     const expenses = await db.raw(`EXEC get_Expenses @ProfileID = ?`, [1]);
     const demographics = await db.raw(`EXEC get_Demographics @ProfileID = ?`, [1]);
-    res.status(201).json({expenses, demographics});
+    res.status(201).json({ expenses: expenses, demographics: demographics[0] });
   }catch(err: any){
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });

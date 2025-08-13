@@ -60,6 +60,24 @@ app.get('/refHowDidYouHearAboutUs', async (req, res) => {
   }
 });
 
+app.get('/refAccountDebtType', async (req, res) => {
+  try {
+    const result = await db.raw('EXEC get_refAccountDebtType');
+    res.json(result || []);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/refCreditorWebDisplay', async (req, res) => {
+  try {
+    const result = await db.raw('EXEC get_refCreditorWebDisplay');
+    res.json(result || []);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.get('/refTypeOfDebt', async (req, res) => {
   try {
     const result = await db.raw('EXEC get_refTypeOfDebt');
@@ -1047,6 +1065,94 @@ app.post('/expenses-04-01', async (req, res) => {
     }
     await db.raw(`EXEC update_Demographics @ProfileID = ?, @Adults = ?, @Children = ?`, [1, adults, children]);
     res.status(201).json({ success: true });
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.post('/expenses-05-01/insert', async (req, res) => {
+  const { CreditorID, DebtTypeID, AccountNumber, Balance, CreditLimit, MonthlyPayment, OtherCreditor, InterestRate } = req.body;
+  try {
+    await db.raw(
+      `EXEC insert_UnsecuredDebt 
+        @ProfileID = ?, 
+        @CreditorID = ?, 
+        @DebtTypeID = ?,
+        @AccountNumber = ?,
+        @Balance = ?,
+        @CreditLimit = ?,
+        @MonthlyPayment = ?,
+        @OtherCreditor = ?,
+        @InterestRate = ?`,
+      [
+        1,
+        CreditorID,
+        DebtTypeID,
+        AccountNumber,
+        Balance,
+        CreditLimit,
+        MonthlyPayment,
+        OtherCreditor,
+        InterestRate
+      ]
+    );
+    const RowID = await db.raw('select MAX(RowID) as NewRowID from UnsecuredDebt where ProfileID = ?', [1]);
+    res.status(201).json(RowID[0]);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.delete('/expenses-05-01/delete', async (req, res) => {
+  const { RowID } = req.body;
+  try{
+    await db.raw(`EXEC delete_UnsecuredDebt @RowID = ?`, [RowID]);
+    res.status(201).json({ success: true });
+  } catch(err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.put('/expenses-05-01/update', async (req, res) => {
+  const { RowID, CreditorID, DebtTypeID, AccountNumber, Balance, CreditLimit, MonthlyPayment, OtherCreditor, InterestRate } = req.body;
+  try{
+    await db.raw(
+      `EXEC update_UnsecuredDebt 
+      @RowID = ?,
+      @CreditorID = ?,
+      @DebtTypeID = ?,
+      @AccountNumber = ?,
+      @Balance = ?,
+      @CreditLimit = ?,
+      @MonthlyPayment = ?,
+      @OtherCreditor = ?,
+      @InterestRate = ?`, 
+      [
+        RowID,
+        CreditorID,
+        DebtTypeID,
+        AccountNumber,
+        Balance,
+        CreditLimit,
+        MonthlyPayment,
+        OtherCreditor,
+        InterestRate
+      ]
+    );
+    res.status(201).json({ success: true });
+  } catch(err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/expenses-05-01', async (req, res) => {
+  try{
+    const data = await db.raw(`EXEC get_UnsecuredDebt @ProfileID = ?`, [1]);
+    res.status(201).json(data);
   }catch(err: any){
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });

@@ -250,6 +250,16 @@ app.post('/refSecuredDebtType/TypeName', async (req, res) => {
   }
 });
 
+app.post('/refCreditorWebDisplay/DisplayName', async (req, res) => {
+  const { CreditorID } = req.body;
+  try {
+    const result = await db.raw('EXEC get_refCreditorWebDisplay_DisplayName_By_CreditorID @CreditorID = ?', [CreditorID]);
+    res.json(result[0] || []);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.get('/refLivingArrangement', async (req, res) => {
   try {
     const result = await db.raw('EXEC get_refLivingArrangement');
@@ -1143,7 +1153,7 @@ app.put('/expenses-05-01/update', async (req, res) => {
       ]
     );
     res.status(201).json({ success: true });
-  } catch(err: any) {
+  }catch(err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
@@ -1153,6 +1163,96 @@ app.get('/expenses-05-01', async (req, res) => {
   try{
     const data = await db.raw(`EXEC get_UnsecuredDebt @ProfileID = ?`, [1]);
     res.status(201).json(data);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/expenses-06-01', async (req, res) => {
+  try{
+    const expenses = await db.raw(`EXEC get_Expenses @ProfileID = ?`, [1]);
+    const securedDebt = await db.raw(`EXEC get_SecuredDebt @ProfileID = ?`, [1]);
+    const unsecuredDebt = await db.raw(`EXEC get_UnsecuredDebt @ProfileID = ?`, [1]);
+    const income = await db.raw(`EXEC get_TotalHouseholdNetIncome @ProfileID = ?`, [1]);
+    res.status(201).json({expenses, securedDebt, unsecuredDebt, totalHouseholdNetIncome: income[0].TotalHouseholdNetIncome});
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.patch('/analysis-01-01', async (req, res) => {
+  const { DoYouFeelConfident, Email, DateOfBirth, EmailBudgetWorksheet, MailBudgetWorksheet } = req.body; 
+  try{
+    await db.raw(
+      `EXEC update_Profile 
+        @ProfileID = ?,
+        @DoYouFeelConfident = ?,
+        @Email = ?,
+        @DateOfBirth = ?,
+        @EmailBudgetWorksheet = ?,
+        @MailBudgetWorksheet = ?`,
+      [
+        1,
+        DoYouFeelConfident,
+        Email,
+        DateOfBirth,
+        EmailBudgetWorksheet,
+        MailBudgetWorksheet
+      ]
+    );
+    res.status(201).json({ success: true });
+  }catch(err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/analysis-01-01', async (req, res) => {
+  try{
+    const data = await db.raw(`EXEC get_Profile @ProfileID = ?`, [1]);
+    res.status(201).json(data[0]);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.patch('/analysis-02-01', async (req, res) => {
+  const { Savings, Cash, RetirementAccounts, Stocks, Cryptocurrency, Bonds, LifeInsurance } = req.body;
+  try{
+    await db.raw(
+      `EXEC update_Savings 
+        @ProfileID = ?,
+        @Savings = ?,
+        @Cash = ?,
+        @RetirementAccounts = ?,
+        @Stocks = ?,
+        @Cryptocurrency = ?,
+        @Bonds = ?,
+        @LifeInsurance = ?`, 
+      [
+        1,
+        Savings,
+        Cash,
+        RetirementAccounts,
+        Stocks,
+        Cryptocurrency,
+        Bonds,
+        LifeInsurance
+      ]
+    );
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/analysis-02-01', async (req, res) => {
+  try{
+    const data = await db.raw(`EXEC get_Savings @ProfileID = ?`, [1]);
+    res.status(201).json(data[0]);
   }catch(err: any){
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });

@@ -1243,6 +1243,7 @@ app.patch('/analysis-02-01', async (req, res) => {
         LifeInsurance
       ]
     );
+    res.status(201).json({ success: true });
   }catch(err: any){
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -1252,6 +1253,16 @@ app.patch('/analysis-02-01', async (req, res) => {
 app.get('/analysis-02-01', async (req, res) => {
   try{
     const data = await db.raw(`EXEC get_Savings @ProfileID = ?`, [1]);
+    res.status(201).json(data[0]);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/analysis-03-01/allocations', async (req, res) => {
+  try{
+    const data = await db.raw(`EXEC get_UserAllocations @ProfileID = ?`, [1]);
     res.status(201).json(data[0]);
   }catch(err: any){
     console.error(err);

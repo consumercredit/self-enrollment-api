@@ -1290,6 +1290,26 @@ app.get('/TotalHouseholdNetIncome', async (req, res) => {
   }
 });
 
+app.get('/analysis-04-01', async (req, res) => {
+  try{
+    const grossMonthlyIncome = await db.raw(`EXEC get_TotalGrossMonthlyIncome @ProfileID = ?`, [1]);
+    const recurringMonthlyDebt = await db.raw(`EXEC get_RecurringMonthlyDebt @ProfileID = ?`, [1]);
+    const totalCreditLimit = await db.raw(`EXEC get_TotalCreditLimit @ProfileID = ?`, [1]);
+    const totalUnsecuredBalance = await db.raw(`EXEC get_TotalUnsecuredBalance @ProfileID = ?`, [1]);
+    res.status(201).json(
+      {
+        grossMonthlyIncome: grossMonthlyIncome[0].TotalGrossMonthlyIncome,
+        recurringMonthlyDebt: recurringMonthlyDebt[0].RecurringMonthlyDebt,
+        totalCreditLimit: totalCreditLimit[0].TotalCreditLimit,
+        totalUnsecuredBalance: totalUnsecuredBalance[0].TotalUnsecuredBalance
+      }
+    );
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Self Enrollment API listening on port ${port}`);
 });

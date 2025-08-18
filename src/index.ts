@@ -1270,6 +1270,26 @@ app.get('/analysis-03-01/allocations', async (req, res) => {
   }
 });
 
+app.get('/analysis-03-01/expenses', async (req, res) => {
+  try{
+    const data = await db.raw(`EXEC get_UserTotalExpenses @ProfileID = ?`, [1]);
+    res.status(201).json(data[0]);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/TotalHouseholdNetIncome', async (req, res) => {
+  try{
+    const data = await db.raw(`EXEC get_TotalHouseholdNetIncome @ProfileID = ?`, [1]);
+    res.status(201).json(data[0].TotalHouseholdNetIncome);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Self Enrollment API listening on port ${port}`);
 });

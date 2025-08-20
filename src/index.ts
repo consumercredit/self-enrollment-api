@@ -1336,7 +1336,7 @@ const updateNetWorthItem = async (item: NetWorthItem, profileID: number, type: s
 }
 
 app.patch('/analysis-05-01', async (req, res) => {
-  const { assets, liabilities } = req.body;
+  const { assets, liabilities, NetWorth } = req.body;
   try{
     assets.forEach((asset: NetWorthItem) => {
       updateNetWorthItem(asset, 1, "asset");
@@ -1344,6 +1344,7 @@ app.patch('/analysis-05-01', async (req, res) => {
     liabilities.forEach((liability: NetWorthItem) => {
       updateNetWorthItem(liability, 1, "liability");
     });
+    await db.raw('EXEC update_Profile @ProfileID = ?, @NetWorth = ?', [1, NetWorth]);
     res.status(201).json({success: true});
   }catch(err: any){
     console.error(err);

@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import knex from 'knex';
 import express from 'express';
 import cors from 'cors';
+import type { NetWorthItem } from './types';
 
 dotenv.config();
 
@@ -1222,19 +1223,19 @@ app.get('/analysis-01-01', async (req, res) => {
 app.patch('/analysis-02-01', async (req, res) => {
   const { Savings, Cash, RetirementAccounts, Stocks, Cryptocurrency, Bonds, LifeInsurance } = req.body;
   try{
-    await db.raw(
-      `EXEC update_Savings 
-        @ProfileID = ?,
-        @Savings = ?,
-        @Cash = ?,
-        @RetirementAccounts = ?,
-        @Stocks = ?,
-        @Cryptocurrency = ?,
-        @Bonds = ?,
-        @LifeInsurance = ?`, 
+    await db.raw(`
+      EXEC update_Savings 
+      @ProfileID = ?,
+      @Savings = ?,
+      @Cash = ?,
+      @RetirementAccounts = ?,
+      @Stocks = ?,
+      @Cryptocurrency = ?,
+      @Bonds = ?,
+      @LifeInsurance = ?`, 
       [
         1,
-        Savings,
+        Savings, 
         Cash,
         RetirementAccounts,
         Stocks,
@@ -1304,6 +1305,46 @@ app.get('/analysis-04-01', async (req, res) => {
         totalUnsecuredBalance: totalUnsecuredBalance[0].TotalUnsecuredBalance
       }
     );
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/analysis-05-01', async (req, res) => {
+  try{
+    const assets = await db.raw(`EXEC get_Assets @ProfileID = ?`, [1]);
+    const liabilities = await db.raw(`EXEC get_Liabilities @ProfileID = ?`, [1]);
+    res.status(201).json({assets: assets, liabilities: liabilities});
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+const updateNetWorthItem = async (item: NetWorthItem, profileID: number, type: string) => {
+  if(type === 'asset'){
+    if(item.Category === 'Secured'){
+      await db.raw(`EXEC update_SecuredDebt @RowID = ?, @CurrentValue = ?`, [item.RowID, item.value]);
+    }else if(item.Category === 'Savings'){
+      const noSpaceName = item.name.replace(' ', '');
+      await db.raw(`EXEC update_Savings @ProfileID = ?, @${noSpaceName} = ?`, [profileID, item.value]);
+    }
+  }else if(type === 'liability'){
+    await db.raw(`EXEC update_SecuredDebt @RowID = ?, @BalanceOwed = ?`, [item.RowID, item.value]);
+  }
+}
+
+app.patch('/analysis-05-01', async (req, res) => {
+  const { assets, liabilities } = req.body;
+  try{
+    assets.forEach((asset: NetWorthItem) => {
+      updateNetWorthItem(asset, 1, "asset");
+    });
+    liabilities.forEach((liability: NetWorthItem) => {
+      updateNetWorthItem(liability, 1, "liability");
+    });
+    res.status(201).json({success: true});
   }catch(err: any){
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });

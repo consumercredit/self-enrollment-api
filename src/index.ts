@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import knex from 'knex';
 import express from 'express';
 import cors from 'cors';
-import type { NetWorthItem } from './types';
+import type { NetWorthItem, ExpenseItem, IncomeItem } from './types';
 
 dotenv.config();
 
@@ -1273,7 +1273,7 @@ app.get('/analysis-03-01/allocations', async (req, res) => {
 
 app.get('/analysis-03-01/expenses', async (req, res) => {
   try{
-    const data = await db.raw(`EXEC get_UserTotalExpenses @ProfileID = ?`, [1]);
+    const data = await db.raw(`EXEC get_TotalExpenses @ProfileID = ?`, [1]);
     res.status(201).json(data[0]);
   }catch(err: any){
     console.error(err);
@@ -1345,6 +1345,149 @@ app.patch('/analysis-05-01', async (req, res) => {
       updateNetWorthItem(liability, 1, "liability");
     });
     await db.raw('EXEC update_Profile @ProfileID = ?, @NetWorth = ?', [1, NetWorth]);
+    res.status(201).json({success: true});
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/surplus-or-deficit', async (req, res) => {
+  try{
+    const result = await db.raw(`EXEC get_Surplus_or_Deficit @ProfileID = ?`, [1]);
+    res.status(201).json(result[0]);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/budget-shortfall', async (req, res) => {
+  try{
+    const profile = await db.raw('EXEC get_Profile @ProfileID = ?', [1]);
+    const securedDebt = await db.raw('EXEC get_TotalSecuredMonthlyPayment @ProfileID = ?', [1]);
+    const unsecuredDebt = await db.raw('EXEC get_TotalUnsecuredMonthlyPayment @ProfileID = ?', [1]);
+    const expenses = await db.raw('EXEC get_Expenses @ProfileID = ?', [1]);
+    const yourIncome = await db.raw('EXEC get_YourIncome @ProfileID = ?', [1]);
+    const yourPartnersIncome = await db.raw('EXEC get_YourPartnersIncome @ProfileID = ?', [1]);
+    const yourSavingsIncome = await db.raw('EXEC get_YourSavingsIncome @ProfileID = ?', [1]);
+    const otherIncome = await db.raw('EXEC get_OtherIncome @ProfileID = ?', [1]);
+    res.status(201).json(
+      {
+        profile: profile[0],
+        securedDebt: securedDebt[0],
+        unsecuredDebt: unsecuredDebt[0],
+        expenses: expenses,
+        yourIncome: yourIncome[0],
+        yourPartnersIncome: yourPartnersIncome[0],
+        yourSavingsIncome: yourSavingsIncome[0],
+        otherIncome: otherIncome
+      }
+    );
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+const updateExpense = async (expense: ExpenseItem) => {
+  await db.raw(`EXEC 
+    update_Expenses 
+    @RowID = ?,
+    @PayPeriodID = ?,
+    @Amount = ?, 
+    @Comment = ?`, 
+    [
+      expense.RowID,
+      expense.PayPeriodID,
+      expense.Amount,
+      expense.Comment
+    ]
+  );
+}
+
+const updateOtherIncome = async (income: IncomeItem) => {
+  await db.raw(`EXEC insert_OtherIncome 
+    @ProfileID = ?, 
+    @Section = ?, 
+    @PayPeriodID = ?, 
+    @Amount = ?`, 
+    [
+      1,
+      income.Section,
+      income.PayPeriodID,
+      income.Amount
+    ]
+  );
+}
+
+app.patch('/budget-shortfall', async (req, res) => {
+  const { 
+    housingExpenses, 
+    transportationExpenses, 
+    livingExpenses, 
+    yourIncome, 
+    yourPartnersIncome, 
+    yourSavingsIncome, 
+    otherIncomes 
+  } = req.body;
+  try{
+    housingExpenses.forEach((expense: ExpenseItem) => {
+      updateExpense(expense);
+    });
+    transportationExpenses.forEach((expense: ExpenseItem) => {
+      updateExpense(expense);
+    });
+    livingExpenses.forEach((expense: ExpenseItem) => {
+      updateExpense(expense);
+    });
+    await db.raw(`EXEC update_YourIncome 
+      @ProfileID = ?,
+      @PayPeriodID = ?, 
+      @GrossIncome = ?, 
+      @NetIncome = ?, 
+      @OtherDeductions = ?, 
+      @PayrollDeductions = ?`,
+      [
+        1,
+        yourIncome.PayPeriodID,
+        yourIncome.GrossIncome,
+        yourIncome.NetIncome,
+        yourIncome.OtherDeductions,
+        yourIncome.PayrollDeductions
+      ]
+    );
+    await db.raw(`EXEC update_YourPartnersIncome 
+      @ProfileID = ?,
+      @PayPeriodID = ?, 
+      @GrossIncome = ?, 
+      @NetIncome = ?, 
+      @PayrollDeductions = ?`,
+      [
+        1,
+        yourPartnersIncome.PayPeriodID,
+        yourPartnersIncome.GrossIncome,
+        yourPartnersIncome.NetIncome,
+        yourPartnersIncome.PayrollDeductions
+      ]
+    );
+    await db.raw(`EXEC update_YourSavingsIncome
+      @ProfileID = ?,
+      @HowLongUseSavings = ?,
+      @HowLongUseSavingsPeriodID = ?,
+      @SavingsAmount = ?,
+      @GrossMonthlySavingsIncome = ?`,
+      [
+        1,
+        yourSavingsIncome.HowLongUseSavings,
+        yourSavingsIncome.HowLongUseSavingsPeriodID,
+        yourSavingsIncome.SavingsAmount,
+        yourSavingsIncome.GrossMonthlySavingsIncome
+      ]
+    );
+    otherIncomes.forEach((income: IncomeItem) => {
+      updateOtherIncome(income);
+    });
     res.status(201).json({success: true});
   }catch(err: any){
     console.error(err);

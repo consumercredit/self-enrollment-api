@@ -1495,6 +1495,16 @@ app.patch('/budget-shortfall', async (req, res) => {
   }
 });
 
+app.get('/analysis-06-01', async (req, res) => {
+  try{
+    const result = await db.raw(`EXEC get_Goals @ProfileID = ?`, [1]);
+    res.status(201).json(result[0]);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Self Enrollment API listening on port ${port}`);
 });

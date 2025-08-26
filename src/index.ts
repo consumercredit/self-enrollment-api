@@ -1505,6 +1505,79 @@ app.get('/analysis-06-01', async (req, res) => {
   }
 });
 
+app.get('/analysis-07-01', async (req, res) => {
+  try{
+    const data = await db.raw(`EXEC get_WaysToTrimBudget @ProfileID = ?`, [1]);
+    res.status(201).json(data[0]);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.patch('/analysis-07-01', async (req, res) => {
+  const {
+    CookAtHome,
+    PackLunch,
+    BatchCook,
+    BuySeasonalProduce,
+    PlanMealsAroundSales,
+    UseCoupons,
+    ThinkBeforeBuy,
+    MaximizeWardrobe,
+    EasyCareClothing,
+    SaveHaircuts,
+    DitchGym,
+    ShopSecondhand
+  } = req.body;  
+  try{
+    await db.raw(`
+      EXEC update_WaysToTrimBudget 
+        @ProfileID = ?,
+        @CookAtHome = ?,
+        @PackLunch = ?,
+        @BatchCook = ?,
+        @BuySeasonalProduce = ?,
+        @PlanMealsAroundSales = ?,
+        @UseCoupons = ?,
+        @ThinkBeforeBuy = ?,
+        @MaximizeWardrobe = ?,
+        @EasyCareClothing = ?,
+        @SaveHaircuts = ?,
+        @DitchGym = ?,
+        @ShopSecondhand = ?
+    `, [
+      1,
+      CookAtHome,
+      PackLunch,
+      BatchCook,
+      BuySeasonalProduce,
+      PlanMealsAroundSales,
+      UseCoupons,
+      ThinkBeforeBuy,
+      MaximizeWardrobe,
+      EasyCareClothing,
+      SaveHaircuts,
+      DitchGym,
+      ShopSecondhand
+    ]);
+    res.status(201).json({success: true});
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/allocations', async (req, res) => {
+  try{
+    const data = await db.raw(`EXEC get_UserAllocations @ProfileID = ?`, [1]);
+    res.status(201).json(data[0]);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Self Enrollment API listening on port ${port}`);
 });

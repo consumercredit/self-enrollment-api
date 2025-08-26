@@ -1311,6 +1311,17 @@ app.get('/analysis-04-01', async (req, res) => {
   }
 });
 
+app.patch('/analysis-04-01', async (req, res) => {
+  const { DebtToIncomeRatio, CreditUtilization } = req.body;
+  try{
+    await db.raw(`EXEC update_Profile @ProfileID = ?, @DebtToIncomeRatio = ?, @CreditUtilization = ?`, [1, DebtToIncomeRatio, CreditUtilization]);
+    res.status(201).json({success: true});
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.get('/analysis-05-01', async (req, res) => {
   try{
     const assets = await db.raw(`EXEC get_Assets @ProfileID = ?`, [1]);
@@ -1505,11 +1516,144 @@ app.get('/analysis-06-01', async (req, res) => {
   }
 });
 
-app.get('/analysis-07-01', async (req, res) => {
+app.get('/WaysToTrimBudget', async (req, res) => {
   try{
     const data = await db.raw(`EXEC get_WaysToTrimBudget @ProfileID = ?`, [1]);
     res.status(201).json(data[0]);
   }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.patch('/WaysToTrimBudget', async (req, res) => {
+  const {
+    CookAtHome = null,
+    PackLunch = null,
+    BatchCook = null,
+    BuySeasonalProduce = null,
+    PlanMealsAroundSales = null,
+    UseCoupons = null,
+    ThinkBeforeBuy = null,
+    MaximizeWardrobe = null,
+    EasyCareClothing = null,
+    SaveHaircuts = null,
+    DitchGym = null,
+    ShopSecondhand = null,
+    RefinanceMortgage = null,
+    IncreaseDeductibles = null,
+    GetRoommate = null,
+    CutTV = null,
+    UpgradeAppliances = null,
+    UseSmartThermostat = null,
+    UnplugElectronics = null,
+    ConserveWater = null,
+    CompareHomeInsurance = null,
+    UseUtilityAssistance = null,
+    UsePublicTransit = null,
+    Carpool = null,
+    DriveLess = null,
+    MaintainVehicle = null,
+    RefinanceCar = null,
+    ShopForCarInsurance = null,
+    UseFuelRewards = null,
+    BikeOrWalk = null,
+    SwitchToFuelEfficientVehicle = null,
+    WorkFromHome = null,
+    GenericMedications = null,
+    LowCostClinics = null,
+    UseUrgentCare = null,
+    AskForCashDiscounts = null,
+    ReviewHospitalBills = null,
+    TrackInsuranceClaims = null
+  } = req.body;
+
+  try {
+    await db.raw(`
+      EXEC update_WaysToTrimBudget 
+        @ProfileID = ?,
+        @CookAtHome = ?,
+        @PackLunch = ?,
+        @BatchCook = ?,
+        @BuySeasonalProduce = ?,
+        @PlanMealsAroundSales = ?,
+        @UseCoupons = ?,
+        @ThinkBeforeBuy = ?,
+        @MaximizeWardrobe = ?,
+        @EasyCareClothing = ?,
+        @SaveHaircuts = ?,
+        @DitchGym = ?,
+        @ShopSecondhand = ?,
+        @RefinanceMortgage = ?,
+        @IncreaseDeductibles = ?,
+        @GetRoommate = ?,
+        @CutTV = ?,
+        @UpgradeAppliances = ?,
+        @UseSmartThermostat = ?,
+        @UnplugElectronics = ?,
+        @ConserveWater = ?,
+        @CompareHomeInsurance = ?,
+        @UseUtilityAssistance = ?,
+        @UsePublicTransit = ?,
+        @Carpool = ?,
+        @DriveLess = ?,
+        @MaintainVehicle = ?,
+        @RefinanceCar = ?,
+        @ShopForCarInsurance = ?,
+        @UseFuelRewards = ?,
+        @BikeOrWalk = ?,
+        @SwitchToFuelEfficientVehicle = ?,
+        @WorkFromHome = ?,
+        @GenericMedications = ?,
+        @LowCostClinics = ?,
+        @UseUrgentCare = ?,
+        @AskForCashDiscounts = ?,
+        @ReviewHospitalBills = ?,
+        @TrackInsuranceClaims = ?
+    `, [
+      1,
+      CookAtHome,
+      PackLunch,
+      BatchCook,
+      BuySeasonalProduce,
+      PlanMealsAroundSales,
+      UseCoupons,
+      ThinkBeforeBuy,
+      MaximizeWardrobe,
+      EasyCareClothing,
+      SaveHaircuts,
+      DitchGym,
+      ShopSecondhand,
+      RefinanceMortgage,
+      IncreaseDeductibles,
+      GetRoommate,
+      CutTV,
+      UpgradeAppliances,
+      UseSmartThermostat,
+      UnplugElectronics,
+      ConserveWater,
+      CompareHomeInsurance,
+      UseUtilityAssistance,
+      UsePublicTransit,
+      Carpool,
+      DriveLess,
+      MaintainVehicle,
+      RefinanceCar,
+      ShopForCarInsurance,
+      UseFuelRewards,
+      BikeOrWalk,
+      SwitchToFuelEfficientVehicle,
+      WorkFromHome,
+      GenericMedications,
+      LowCostClinics,
+      UseUrgentCare,
+      AskForCashDiscounts,
+      ReviewHospitalBills,
+      TrackInsuranceClaims
+    ]);
+
+    res.status(201).json({ success: true });
+  } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
@@ -1568,10 +1712,78 @@ app.patch('/analysis-07-01', async (req, res) => {
   }
 });
 
+app.patch('/analysis-07-02', async (req, res) => {
+  const {
+    RefinanceMortgage,
+    IncreaseDeductibles,
+    GetRoommate,
+    CutTV,
+    UpgradeAppliances,
+    UseSmartThermostat,
+    UnplugElectronics,
+    ConserveWater,
+    CompareHomeInsurance,
+    UseUtilityAssistance
+  } = req.body;
+
+  try {
+    await db.raw(`
+      EXEC update_WaysToTrimBudget 
+        @ProfileID = ?,
+        @RefinanceMortgage = ?,
+        @IncreaseDeductibles = ?,
+        @GetRoommate = ?,
+        @CutTV = ?,
+        @UpgradeAppliances = ?,
+        @UseSmartThermostat = ?,
+        @UnplugElectronics = ?,
+        @ConserveWater = ?,
+        @CompareHomeInsurance = ?,
+        @UseUtilityAssistance = ?
+    `, [
+      1,
+      RefinanceMortgage,
+      IncreaseDeductibles,
+      GetRoommate,
+      CutTV,
+      UpgradeAppliances,
+      UseSmartThermostat,
+      UnplugElectronics,
+      ConserveWater,
+      CompareHomeInsurance,
+      UseUtilityAssistance
+    ]);
+    res.status(201).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 app.get('/allocations', async (req, res) => {
   try{
     const data = await db.raw(`EXEC get_UserAllocations @ProfileID = ?`, [1]);
     res.status(201).json(data[0]);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/TotalUnsecuredBalance', async (req, res) => {
+  try{
+    const data = await db.raw(`EXEC get_TotalUnsecuredBalance @ProfileID = ?`, [1]);
+    res.status(201).json(data[0].TotalUnsecuredBalance);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+app.get('/analysis-08-01', async (req, res) => {
+  try{
+    const profile = await db.raw(`EXEC get_Profile @ProfileID = ?`, [1]);
+    res.status(201).json({DebtToIncomeRatio: profile[0].DebtToIncomeRatio, CreditUtilization: profile[0].CreditUtilization});
   }catch(err: any){
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });

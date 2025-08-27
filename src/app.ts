@@ -6,6 +6,7 @@ import cors from 'cors';
 import referenceRoutes from './routes/reference';
 import tableRoutes from './routes/tables';
 import valueRoutes from './routes/values';
+import pageRoutes from './routes/pages';
 
 dotenv.config();
 
@@ -52,6 +53,7 @@ const port = process.env.PORT || 3000;
 app.use('/ref', referenceRoutes);
 app.use('/tables', tableRoutes);
 app.use('/values', valueRoutes);
+app.use('/pages', pageRoutes);
 
 app.use(cors({
   origin: 'http://localhost:5173',

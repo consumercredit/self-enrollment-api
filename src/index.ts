@@ -5,6 +5,8 @@ import express from 'express';
 import cors from 'cors';
 import type { NetWorthItem, ExpenseItem, IncomeItem } from './types';
 
+//OUTDATED FILE - USE ONLY FOR REFERENCE
+
 dotenv.config();
 
 const db_user = process.env.DB_USER;

@@ -6,7 +6,7 @@ const router = Router();
 router.get('/Concerns', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_Concerns @ProfileID = ?`, [1]);
-    res.status(201).json(data[0]);
+    res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -43,7 +43,7 @@ router.patch('/Concerns', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -53,7 +53,7 @@ router.patch('/Concerns', async (req, res) => {
 router.get('/Demographics', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_Demographics @ProfileID = ?`, [1]);
-    res.status(201).json(data[0]);
+    res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -129,7 +129,7 @@ router.patch('/Demographics', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -139,7 +139,7 @@ router.patch('/Demographics', async (req, res) => {
 router.get('/Employment', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_Employment @ProfileID = ?`, [1]);
-    res.status(201).json(data[0]);
+    res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -176,7 +176,7 @@ router.patch('/Employment', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -186,7 +186,7 @@ router.patch('/Employment', async (req, res) => {
 router.get('/Expenses', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_Expenses @ProfileID = ?`, [1]);
-    res.status(201).json(data);
+    res.status(200).json(data);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -223,7 +223,7 @@ router.patch('/Expenses', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -233,7 +233,7 @@ router.patch('/Expenses', async (req, res) => {
 router.get('/Goals', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_Goals @ProfileID = ?`, [1]);
-    res.status(201).json(data[0]);
+    res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -294,7 +294,7 @@ router.patch('/Goals', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -304,7 +304,7 @@ router.patch('/Goals', async (req, res) => {
 router.get('/Habits', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_Habits @ProfileID = ?`, [1]);
-    res.status(201).json(data[0]);
+    res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -353,7 +353,7 @@ router.patch('/Habits', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -363,7 +363,7 @@ router.patch('/Habits', async (req, res) => {
 router.get('/Issues', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_Issues @ProfileID = ?`, [1]);
-    res.status(201).json(data[0]);
+    res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -451,7 +451,7 @@ router.patch('/Issues', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -461,7 +461,7 @@ router.patch('/Issues', async (req, res) => {
 router.get('/OtherIncome', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_OtherIncome @ProfileID = ?`, [1]);
-    res.status(201).json(data);
+    res.status(200).json(data);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -492,7 +492,7 @@ router.patch('/OtherIncome', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -502,7 +502,7 @@ router.patch('/OtherIncome', async (req, res) => {
 router.get('/Profile', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_Profile @ProfileID = ?`, [1]);
-    res.status(201).json(data[0]);
+    res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -578,7 +578,7 @@ router.patch('/Profile', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -588,7 +588,7 @@ router.patch('/Profile', async (req, res) => {
 router.get('/Savings', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_Savings @ProfileID = ?`, [1]);
-    res.status(201).json(data[0]);
+    res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -631,57 +631,7 @@ router.patch('/Savings', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: 'Database error', details: err.message });
-  }
-});
-
-router.get('/SecuredDebt', async (req, res) => {
-  try {
-    const data = await db.raw(`EXEC get_SecuredDebt @ProfileID = ?`, [1]);
-    res.status(201).json(data);
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ error: 'Database error', details: err.message });
-  }
-});
-
-router.patch('/SecuredDebt', async (req, res) => {
-  const {
-    TypeID = null,
-    MonthlyPayment = null,
-    AccountHolderID = null,
-    StatusID = null,
-    CurrentValue = null,
-    BalanceOwed = null
-  } = req.body;
-
-  try {
-    await db.raw(
-      `
-      EXEC update_SecuredDebt 
-        @ProfileID = ?,
-        @TypeID = ?,
-        @MonthlyPayment = ?,
-        @AccountHolderID = ?,
-        @StatusID = ?,
-        @CurrentValue = ?,
-        @BalanceOwed = ?
-      `,
-      [
-        1,
-        TypeID,
-        MonthlyPayment,
-        AccountHolderID,
-        StatusID,
-        CurrentValue,
-        BalanceOwed
-      ]
-    );
-
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -691,7 +641,7 @@ router.patch('/SecuredDebt', async (req, res) => {
 router.get('/SideWork', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_SideWork @ProfileID = ?`, [1]);
-    res.status(201).json(data[0]);
+    res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -731,8 +681,100 @@ router.patch('/SideWork', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+router.get('/SecuredDebt', async (req, res) => {
+  try {
+    const data = await db.raw(`EXEC get_SecuredDebt @ProfileID = ?`, [1]);
+    res.status(200).json(data);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+router.patch('/SecuredDebt', async (req, res) => {
+  const {
+    RowID,
+    TypeID = null,
+    MonthlyPayment = null,
+    AccountHolderID = null,
+    StatusID = null,
+    CurrentValue = null,
+    BalanceOwed = null
+  } = req.body;
+
+  try {
+    await db.raw(
+      `
+      EXEC update_SecuredDebt 
+        @RowID = ?,
+        @TypeID = ?,
+        @MonthlyPayment = ?,
+        @AccountHolderID = ?,
+        @StatusID = ?,
+        @CurrentValue = ?,
+        @BalanceOwed = ?
+      `,
+      [
+        RowID,
+        TypeID,
+        MonthlyPayment,
+        AccountHolderID,
+        StatusID,
+        CurrentValue,
+        BalanceOwed
+      ]
+    );
+
+    res.status(200).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+router.post('/SecuredDebt', async (req, res) => {
+  const { TypeID, MonthlyPayment, AccountHolderID, StatusID, CurrentValue, BalanceOwed } = req.body;
+  try {
+    await db.raw(
+      `EXEC insert_SecuredDebt 
+        @ProfileID = ?, 
+        @TypeID = ?, 
+        @MonthlyPayment = ?, 
+        @AccountHolderID = ?, 
+        @StatusID = ?, 
+        @CurrentValue = ?, 
+        @BalanceOwed = ?`,
+      [
+        1,
+        TypeID,
+        MonthlyPayment,
+        AccountHolderID,
+        StatusID,
+        CurrentValue,
+        BalanceOwed
+      ]
+    );
+    const RowID = await db('SecuredDebt').where({ ProfileID: 1 }).max('RowID as NewRowID');
+    res.status(201).json(RowID[0]);
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+router.delete('/SecuredDebt', async (req, res) => {
+  const { RowID } = req.body;
+  try{
+    await db.raw(`EXEC delete_SecuredDebt @RowID = ?`, [RowID]);
+    res.status(204).json({ success: true });
+  } catch(err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
@@ -741,7 +783,7 @@ router.patch('/SideWork', async (req, res) => {
 router.get('/UnsecuredDebt', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_UnsecuredDebt @ProfileID = ?`, [1]);
-    res.status(201).json(data);
+    res.status(200).json(data);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -750,6 +792,7 @@ router.get('/UnsecuredDebt', async (req, res) => {
 
 router.patch('/UnsecuredDebt', async (req, res) => {
   const {
+    RowID,
     CreditorID = null,
     DebtTypeID = null,
     AccountNumber = null,
@@ -764,7 +807,7 @@ router.patch('/UnsecuredDebt', async (req, res) => {
     await db.raw(
       `
       EXEC update_UnsecuredDebt 
-        @ProfileID = ?,
+        @RowID = ?,
         @CreditorID = ?,
         @DebtTypeID = ?,
         @AccountNumber = ?,
@@ -774,6 +817,50 @@ router.patch('/UnsecuredDebt', async (req, res) => {
         @OtherCreditor = ?,
         @InterestRate = ?
       `,
+      [
+        RowID,
+        CreditorID,
+        DebtTypeID,
+        AccountNumber,
+        Balance,
+        CreditLimit,
+        MonthlyPayment,
+        OtherCreditor,
+        InterestRate
+      ]
+    );
+
+    res.status(200).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+router.post('/UnsecuredDebt', async (req, res) => {
+  const {
+    CreditorID,
+    DebtTypeID,
+    AccountNumber,
+    Balance,
+    CreditLimit,
+    MonthlyPayment,
+    OtherCreditor = null,
+    InterestRate
+  } = req.body;
+
+  try {
+    await db.raw(
+      `EXEC insert_UnsecuredDebt 
+        @ProfileID = ?, 
+        @CreditorID = ?, 
+        @DebtTypeID = ?,
+        @AccountNumber = ?,
+        @Balance = ?,
+        @CreditLimit = ?,
+        @MonthlyPayment = ?,
+        @OtherCreditor = ?,
+        @InterestRate = ?`,
       [
         1,
         CreditorID,
@@ -786,9 +873,20 @@ router.patch('/UnsecuredDebt', async (req, res) => {
         InterestRate
       ]
     );
-
-    res.status(201).json({ success: true });
+    const RowID = await db('UnsecuredDebt').where({ ProfileID: 1 }).max('RowID as NewRowID');
+    res.status(201).json(RowID[0]);
   } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+router.delete('/UnsecuredDebt', async (req, res) => {
+  const { RowID } = req.body;
+  try{
+    await db.raw(`EXEC delete_UnsecuredDebt @RowID = ?`, [RowID]);
+    res.status(204).json({ success: true });
+  } catch(err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
@@ -797,7 +895,7 @@ router.patch('/UnsecuredDebt', async (req, res) => {
 router.get('/WaysToOvercome', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_WaysToOvercome @ProfileID = ?`, [1]);
-    res.status(201).json(data[0]);
+    res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -852,7 +950,7 @@ router.patch('/WaysToOvercome', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -862,7 +960,7 @@ router.patch('/WaysToOvercome', async (req, res) => {
 router.get('/WaysToTrimBudget', async (req, res) => {
   try{
     const data = await db.raw(`EXEC get_WaysToTrimBudget @ProfileID = ?`, [1]);
-    res.status(201).json(data[0]);
+    res.status(200).json(data[0]);
   }catch(err: any){
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -995,7 +1093,7 @@ router.patch('/WaysToTrimBudget', async (req, res) => {
       TrackInsuranceClaims
     ]);
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -1005,7 +1103,7 @@ router.patch('/WaysToTrimBudget', async (req, res) => {
 router.get('/YourIncome', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_YourIncome @ProfileID = ?`, [1]);
-    res.status(201).json(data[0]);
+    res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -1045,7 +1143,7 @@ router.patch('/YourIncome', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -1055,7 +1153,7 @@ router.patch('/YourIncome', async (req, res) => {
 router.get('/YourPartnersIncome', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_YourPartnersIncome @ProfileID = ?`, [1]);
-    res.status(201).json(data[0]);
+    res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -1089,7 +1187,7 @@ router.patch('/YourPartnersIncome', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -1099,7 +1197,7 @@ router.patch('/YourPartnersIncome', async (req, res) => {
 router.get('/YourSavingsIncome', async (req, res) => {
   try {
     const data = await db.raw(`EXEC get_YourSavingsIncome @ProfileID = ?`, [1]);
-    res.status(201).json(data[0]);
+    res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -1133,7 +1231,7 @@ router.patch('/YourSavingsIncome', async (req, res) => {
       ]
     );
 
-    res.status(201).json({ success: true });
+    res.status(200).json({ success: true });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });

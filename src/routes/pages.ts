@@ -6,24 +6,31 @@ import { updateNetWorthItem, updateExpense, updateOtherIncome } from '../functio
 const router = Router();
 
 router.post('/concerns-01-01', async (req, res) => {
-    const { HowDidYouHearAboutUsID, TypeOfDebtID, AmountOwedID, PaymentStatusID, PrimaryHardshipID, QualityOfLifeImpact } = req.body;
-    try {
-      await db.raw(
-        `EXEC update_Concerns 
-          @ProfileID = ?,
-          @TypeOfDebtID = ?, 
-          @AmountOwedID = ?, 
-          @PaymentStatusID = ?, 
-          @PrimaryHardshipID = ?,
-          @QualityOfLifeImpact = ?`,
-        [1, TypeOfDebtID, AmountOwedID, PaymentStatusID, PrimaryHardshipID, QualityOfLifeImpact]
-      );
-      await db.raw('EXEC update_Profile @ProfileID = ?, @HowDidYouHearAboutUsID = ?', [1, HowDidYouHearAboutUsID]);
-      res.status(201).json({ success: true });
-    } catch (err: any) {
-      console.error(err);
-      res.status(500).json({ error: 'Database error', details: err.message });
-    }
+  const { HowDidYouHearAboutUsID, TypeOfDebtID, creditCardDebtDetails } = req.body;
+  try {
+    await db.raw(
+      `EXEC update_Concerns 
+        @ProfileID = ?,
+        @TypeOfDebtID = ?, 
+        @AmountOwedID = ?, 
+        @PaymentStatusID = ?, 
+        @PrimaryHardshipID = ?,
+        @QualityOfLifeImpact = ?`,
+      [
+        1, 
+        TypeOfDebtID, 
+        creditCardDebtDetails.AmountOwedID, 
+        creditCardDebtDetails.PaymentStatusID, 
+        creditCardDebtDetails.PrimaryHardshipID, 
+        creditCardDebtDetails.QualityOfLifeImpact
+      ]
+    );
+    await db.raw('EXEC update_Profile @ProfileID = ?, @HowDidYouHearAboutUsID = ?', [1, HowDidYouHearAboutUsID]);
+    res.status(201).json({ success: true });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
 });
   
 router.get('/concerns-01-01', async (req, res) => {
@@ -110,7 +117,19 @@ router.get('/concerns-01-02', async (req, res) => {
 });
   
 router.post('/concerns-01-03', async (req, res) => {
-    const { waysToOvercome } = req.body;
+    const {
+      CallingACCC,
+      ContactedCreditors,
+      ContactedAttorney,
+      WorkingNightsWeekends,
+      FoundBetterJob,
+      SpendingLess,
+      SecondJob,
+      SellProperty,
+      SoldOtherAssets,
+      Other,
+      OtherDescription
+    } = req.body;
     try {
       await db.raw(
         `EXEC update_WaysToOvercome
@@ -128,17 +147,17 @@ router.post('/concerns-01-03', async (req, res) => {
           @OtherDescription = ?`,
         [
           1,
-          waysToOvercome.callingACCC,
-          waysToOvercome.contactedCreditors,
-          waysToOvercome.contactedAttorney,
-          waysToOvercome.workingNightsWeekends,
-          waysToOvercome.foundBetterJob,
-          waysToOvercome.spendingLess,
-          waysToOvercome.secondJob,
-          waysToOvercome.sellProperty,
-          waysToOvercome.soldOtherAssets,
-          waysToOvercome.other,
-          waysToOvercome.otherDescription
+          CallingACCC,
+          ContactedCreditors,
+          ContactedAttorney,
+          WorkingNightsWeekends,
+          FoundBetterJob,
+          SpendingLess,
+          SecondJob,
+          SellProperty,
+          SoldOtherAssets,
+          Other,
+          OtherDescription
         ]
       );
       res.status(201).json({ success: true });
@@ -215,7 +234,14 @@ router.get('/concerns-03-01', async (req, res) => {
 });
   
 router.post('/concerns-03-02', async (req, res) => {
-    const { demoInfo } = req.body;
+    const {
+      EmploymentID,
+      TypeOfWork,
+      DoesSideWork,
+      MilitaryID,
+      PlanToLeaveMilitary,
+      SideWorkDetails
+    } = req.body;
     try {
       await db.raw(
         `EXEC update_Employment 
@@ -227,15 +253,15 @@ router.post('/concerns-03-02', async (req, res) => {
           @PlanToLeaveMilitary = ?`,
         [
           1,
-          demoInfo.employment,
-          demoInfo.work,
-          demoInfo.sideWork,
-          demoInfo.military,
-          demoInfo.planToLeaveMilitary
+          EmploymentID,
+          TypeOfWork,
+          DoesSideWork,
+          MilitaryID,
+          PlanToLeaveMilitary
         ]
       );
   
-      if (demoInfo.sideWork) {
+      if (DoesSideWork) {
         await db.raw(
           `EXEC update_SideWork 
             @ProfileID = ?, 
@@ -247,12 +273,12 @@ router.post('/concerns-03-02', async (req, res) => {
             @TypeOfBusinessOther = ?`,
           [
             1,
-            demoInfo.sideWorkDetails.zip,
-            demoInfo.sideWorkDetails.employees,
-            demoInfo.sideWorkDetails.yearsEmployed,
-            demoInfo.sideWorkDetails.typeOfBusiness,
-            demoInfo.sideWorkDetails.revenueID,
-            demoInfo.sideWorkDetails.typeOfBusinessOther
+            SideWorkDetails.zip,
+            SideWorkDetails.employees,
+            SideWorkDetails.yearsEmployed,
+            SideWorkDetails.typeOfBusiness,
+            SideWorkDetails.revenueID,
+            SideWorkDetails.typeOfBusinessOther
           ]
         );
       }

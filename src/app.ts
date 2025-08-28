@@ -50,15 +50,15 @@ const app = express();
 app.use(express.json());
 const port = process.env.PORT || 3000;
 
-app.use('/ref', referenceRoutes);
-app.use('/tables', tableRoutes);
-app.use('/values', valueRoutes);
-app.use('/pages', pageRoutes);
-
 app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true // Optional: only if you're sending cookies or auth headers
 }));
+
+app.use('/ref', referenceRoutes);
+app.use('/tables', tableRoutes);
+app.use('/values', valueRoutes);
+app.use('/pages', pageRoutes);
 
 app.listen(port, () => {
     console.log(`Self Enrollment API listening on port ${port}`);

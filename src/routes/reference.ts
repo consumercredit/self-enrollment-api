@@ -31,7 +31,7 @@ router.get('/CreditorWebDisplay', async (req, res) => {
         .select('DisplayName')
         .where({ CreditorID: Number(CreditorID) });
 
-      res.status(200).json(result[0] || []);
+      res.status(200).json(result[0].DisplayName || []);
     } else {
       result = await db.raw('EXEC get_refCreditorWebDisplay');
       res.status(200).json(result || []);
@@ -204,7 +204,7 @@ router.get('/SecuredDebtType', async (req, res) => {
         .select('Type')
         .where({ TypeID: Number(TypeID) });
 
-      res.status(200).json(result[0] || []);
+      res.status(200).json(result[0].Type || []);
     } else {
       result = await db.raw('EXEC get_refSecuredDebtType');
       res.status(200).json(result || []);

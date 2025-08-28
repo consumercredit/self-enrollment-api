@@ -796,7 +796,7 @@ router.get('/expenses-06-01', async (req, res) => {
     }
 });
   
-router.patch('/analysis-01-01', async (req, res) => {
+router.post('/analysis-01-01', async (req, res) => {
     const { DoYouFeelConfident, Email, DateOfBirth, EmailBudgetWorksheet, MailBudgetWorksheet } = req.body; 
     try{
       await db.raw(
@@ -833,7 +833,7 @@ router.get('/analysis-01-01', async (req, res) => {
     }
 });
   
-router.patch('/analysis-02-01', async (req, res) => {
+router.post('/analysis-02-01', async (req, res) => {
     const { Savings, Cash, RetirementAccounts, Stocks, Cryptocurrency, Bonds, LifeInsurance } = req.body;
     try{
       await db.raw(`
@@ -894,7 +894,7 @@ router.get('/analysis-04-01', async (req, res) => {
     }
 });
   
-router.patch('/analysis-04-01', async (req, res) => {
+router.post('/analysis-04-01', async (req, res) => {
     const { DebtToIncomeRatio, CreditUtilization } = req.body;
     try{
       await db.raw(`EXEC update_Profile @ProfileID = ?, @DebtToIncomeRatio = ?, @CreditUtilization = ?`, [1, DebtToIncomeRatio, CreditUtilization]);
@@ -916,7 +916,7 @@ router.get('/analysis-05-01', async (req, res) => {
     }
 });
   
-router.patch('/analysis-05-01', async (req, res) => {
+router.post('/analysis-05-01', async (req, res) => {
     const { assets, liabilities, NetWorth } = req.body;
     try{
       assets.forEach((asset: NetWorthItem) => {
@@ -961,7 +961,7 @@ router.get('/budget-shortfall', async (req, res) => {
     }
 });
   
-router.patch('/budget-shortfall', async (req, res) => {
+router.post('/budget-shortfall', async (req, res) => {
     const { 
       housingExpenses, 
       transportationExpenses, 
@@ -1045,7 +1045,7 @@ router.get('/analysis-06-01', async (req, res) => {
     }
 });
   
-router.patch('/analysis-07-01', async (req, res) => {
+router.post('/analysis-07-01', async (req, res) => {
     const {
       CookAtHome,
       PackLunch,
@@ -1098,7 +1098,7 @@ router.patch('/analysis-07-01', async (req, res) => {
     }
 });
   
-router.patch('/analysis-07-02', async (req, res) => {
+router.post('/analysis-07-02', async (req, res) => {
     const {
       RefinanceMortgage,
       IncreaseDeductibles,

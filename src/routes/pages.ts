@@ -121,19 +121,7 @@ router.get('/concerns-01-02', async (req, res) => {
 });
   
 router.post('/concerns-01-03', async (req, res) => {
-  const {
-    CallingACCC,
-    ContactedCreditors,
-    ContactedAttorney,
-    WorkingNightsWeekends,
-    FoundBetterJob,
-    SpendingLess,
-    SecondJob,
-    SellProperty,
-    SoldOtherAssets,
-    Other,
-    OtherDescription
-  } = req.body;
+  const { waysToOvercome } = req.body;
   try {
     await db.raw(
       `EXEC update_WaysToOvercome
@@ -151,17 +139,17 @@ router.post('/concerns-01-03', async (req, res) => {
         @OtherDescription = ?`,
       [
         1,
-        CallingACCC,
-        ContactedCreditors,
-        ContactedAttorney,
-        WorkingNightsWeekends,
-        FoundBetterJob,
-        SpendingLess,
-        SecondJob,
-        SellProperty,
-        SoldOtherAssets,
-        Other,
-        OtherDescription
+        waysToOvercome.CallingACCC,
+        waysToOvercome.ContactedCreditors,
+        waysToOvercome.ContactedAttorney,
+        waysToOvercome.WorkingNightsWeekends,
+        waysToOvercome.FoundBetterJob,
+        waysToOvercome.SpendingLess,
+        waysToOvercome.SecondJob,
+        waysToOvercome.SellProperty,
+        waysToOvercome.SoldOtherAssets,
+        waysToOvercome.Other,
+        waysToOvercome.OtherDescription
       ]
     );
     res.status(201).json({ success: true });

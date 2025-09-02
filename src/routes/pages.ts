@@ -240,14 +240,7 @@ router.get('/concerns-03-01', async (req, res) => {
 });
   
 router.post('/concerns-03-02', async (req, res) => {
-  const {
-    EmploymentID,
-    TypeOfWork,
-    DoesSideWork,
-    MilitaryID,
-    PlanToLeaveMilitary,
-    SideWorkDetails
-  } = req.body;
+  const { demoInfo } = req.body;
   try {
     await db.raw(
       `EXEC update_Employment 
@@ -259,14 +252,14 @@ router.post('/concerns-03-02', async (req, res) => {
         @PlanToLeaveMilitary = ?`,
       [
         1,
-        EmploymentID,
-        TypeOfWork,
-        DoesSideWork,
-        MilitaryID,
-        PlanToLeaveMilitary
+        demoInfo.EmploymentID,
+        demoInfo.TypeOfWork,
+        demoInfo.DoesSideWork,
+        demoInfo.MilitaryID,
+        demoInfo.PlanToLeaveMilitary
       ]
     );
-    if (DoesSideWork) {
+    if (demoInfo.DoesSideWork) {
       await db.raw(
         `EXEC update_SideWork 
           @ProfileID = ?, 
@@ -278,12 +271,12 @@ router.post('/concerns-03-02', async (req, res) => {
           @TypeOfBusinessOther = ?`,
         [
           1,
-          SideWorkDetails.Zip,
-          SideWorkDetails.Employees,
-          SideWorkDetails.YearsEmployed,
-          SideWorkDetails.TypeOfBusinessID,
-          SideWorkDetails.RevenueID,
-          SideWorkDetails.TypeOfBusinessOther
+          demoInfo.SideWorkDetails.Zip,
+          demoInfo.SideWorkDetails.Employees,
+          demoInfo.SideWorkDetails.YearsEmployed,
+          demoInfo.SideWorkDetails.TypeOfBusinessID,
+          demoInfo.SideWorkDetails.RevenueID,
+          demoInfo.SideWorkDetails.TypeOfBusinessOther
         ]
       );
     }
@@ -644,10 +637,16 @@ router.post('/income-01-01', async (req, res) => {
   
 router.get('/income-02-01', async (req, res) => {
   try {
-    const data = await db('OtherIncome')
+    const otherincome = await db('OtherIncome')
       .select('*')
       .where({ ProfileID: 1 });
-    res.status(200).json(data);
+    const totalgrossincome = await db.raw('EXEC get_TotalGrossMonthlyIncome @ProfileID = ?', [1]);
+    const totalnetincome = await db.raw('EXEC get_TotalHouseholdNetIncome @ProfileID = ?', [1]);
+    res.status(200).json({ 
+      otherincome: otherincome,
+      totalgrossincome: totalgrossincome[0].TotalGrossMonthlyIncome,
+      totalnetincome: totalnetincome[0].TotalHouseholdNetIncome
+    });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -854,7 +853,7 @@ router.get('/expenses-06-01', async (req, res) => {
 });
   
 router.post('/analysis-01-01', async (req, res) => {
-  const { DoYouFeelConfident, Email, DateOfBirth, EmailBudgetWorksheet, MailBudgetWorksheet } = req.body; 
+  const { formData } = req.body; 
   try{
     await db.raw(
       `EXEC update_Profile 
@@ -866,11 +865,11 @@ router.post('/analysis-01-01', async (req, res) => {
         @MailBudgetWorksheet = ?`,
       [
         1,
-        DoYouFeelConfident,
-        Email,
-        DateOfBirth,
-        EmailBudgetWorksheet,
-        MailBudgetWorksheet
+        formData.DoYouFeelConfident,
+        formData.Email,
+        formData.DateOfBirth,
+        formData.EmailBudgetWorksheet,
+        formData.MailBudgetWorksheet
       ]
     );
     res.status(201).json({ success: true });
@@ -943,10 +942,10 @@ router.get('/analysis-04-01', async (req, res) => {
     const TotalUnsecuredBalance = await db.raw(`EXEC get_TotalUnsecuredBalance @ProfileID = ?`, [1]);
     res.status(200).json(
       {
-        GrossMonthlyIncome,
-        RecurringMonthlyDebt,
-        TotalCreditLimit,
-        TotalUnsecuredBalance
+        GrossMonthlyIncome: GrossMonthlyIncome[0].TotalGrossMonthlyIncome,
+        RecurringMonthlyDebt: RecurringMonthlyDebt[0].RecurringMonthlyDebt,
+        TotalCreditLimit: TotalCreditLimit[0].TotalCreditLimit,
+        TotalUnsecuredBalance: TotalUnsecuredBalance[0].TotalUnsecuredBalance
       }
     );
   }catch(err: any){
@@ -1161,7 +1160,55 @@ router.post('/analysis-07-01', async (req, res) => {
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });
+
+router.get('/analysis-07-01', async (req, res) => {
+  try{
+    const data = await db('WaysToTrimBudget')
+      .select([
+        'CookAtHome',
+        'PackLunch', 
+        'BatchCook', 
+        'BuySeasonalProduce', 
+        'PlanMealsAroundSales', 
+        'UseCoupons', 
+        'ThinkBeforeBuy', 
+        'MaximizeWardrobe', 
+        'EasyCareClothing', 
+        'SaveHaircuts', 
+        'DitchGym', 
+        'ShopSecondhand'
+      ])
+      .where({ ProfileID: 1 });
+    res.status(200).json(data[0]);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
   
+router.get('/analysis-07-02', async (req, res) => {
+  try{
+    const data = await db('WaysToTrimBudget')
+      .select([
+        'RefinanceMortgage',
+        'IncreaseDeductibles',
+        'GetRoommate',
+        'CutTV',
+        'UpgradeAppliances',
+        'UseSmartThermostat',
+        'UnplugElectronics',
+        'ConserveWater',
+        'CompareHomeInsurance',
+        'UseUtilityAssistance'
+      ])
+      .where({ ProfileID: 1 });
+    res.status(200).json(data[0]);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 router.post('/analysis-07-02', async (req, res) => {
   const {
     RefinanceMortgage,

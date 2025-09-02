@@ -5,7 +5,7 @@ const router = Router();
 
 router.get('/TotalExpenses', async (req, res) => {
   try{
-    const data = await db.raw(`EXEC get_TotalExpenses @ProfileID = ?`, [1]);
+    const data = await db.raw(`EXEC get_TotalExpenses_ByCategory @ProfileID = ?`, [1]);
     res.status(200).json(data[0]);
   }catch(err: any){
     console.error(err);

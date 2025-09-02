@@ -854,9 +854,9 @@ router.get('/expenses-05-01', async (req, res) => {
   
 router.get('/expenses-06-01', async (req, res) => {
   try{
-    const expenses = await db.raw(`EXEC get_Expenses @ProfileID = ?`, [1]);
-    const securedDebt = await db.raw(`EXEC get_SecuredDebt @ProfileID = ?`, [1]);
-    const unsecuredDebt = await db.raw(`EXEC get_UnsecuredDebt @ProfileID = ?`, [1]);
+    const expenses = await db('Expenses').select('*').where({ ProfileID: 1 });
+    const securedDebt = await db('SecuredDebt').select('*').where({ ProfileID: 1 });
+    const unsecuredDebt = await db('UnsecuredDebt').select('*').where({ ProfileID: 1 });
     const income = await db.raw(`EXEC get_TotalHouseholdNetIncome @ProfileID = ?`, [1]);
     res.status(200).json({expenses, securedDebt, unsecuredDebt, totalHouseholdNetIncome: income[0].TotalHouseholdNetIncome});
   }catch(err: any){

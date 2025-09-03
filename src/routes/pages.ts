@@ -687,18 +687,6 @@ router.post('/income-02-01', async (req, res) => {
   }
 });
   
-router.get('/expenses-01-01', async (req, res) => {
-  try{
-    const data = await db('SecuredDebt')
-      .select('*')
-      .where({ ProfileID: 1 });
-    res.status(200).json(data);
-  }catch(err: any){
-    console.error(err);
-    res.status(500).json({ error: 'Database error', details: err.message });
-  }
-});
-  
 router.post('/expenses-02-01', async (req, res) => {
   const { expenses, LivingArrangementID } = req.body;
   try{
@@ -821,18 +809,6 @@ router.post('/expenses-04-01', async (req, res) => {
     }
     await db.raw(`EXEC update_Demographics @ProfileID = ?, @Adults = ?, @Children = ?`, [1, adults, children]);
     res.status(201).json({ success: true });
-  }catch(err: any){
-    console.error(err);
-    res.status(500).json({ error: 'Database error', details: err.message });
-  }
-});
-  
-router.get('/expenses-05-01', async (req, res) => {
-  try{
-    const data = await db('UnsecuredDebt')
-      .select('*')
-      .where({ ProfileID: 1 });
-    res.status(200).json(data);
   }catch(err: any){
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
@@ -1252,6 +1228,88 @@ router.post('/analysis-07-02', async (req, res) => {
     ]);
     res.status(201).json({ success: true });
   } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+router.post('/analysis-07-03', async (req, res) => {
+  const {
+    UsePublicTransit,
+    Carpool,
+    DriveLess,
+    MaintainVehicle,
+    RefinanceCar,
+    ShopForCarInsurance,
+    UseFuelRewards,
+    BikeOrWalk,
+    SwitchToFuelEfficientVehicle,
+    WorkFromHome
+  } = req.body;
+  try{
+    await db.raw(`EXEC update_WaysToTrimBudget 
+      @ProfileID = ?, 
+      @UsePublicTransit = ?,
+      @Carpool = ?,
+      @DriveLess = ?,
+      @MaintainVehicle = ?,
+      @RefinanceCar = ?,
+      @ShopForCarInsurance = ?,
+      @UseFuelRewards = ?,
+      @BikeOrWalk = ?,
+      @SwitchToFuelEfficientVehicle = ?,
+      @WorkFromHome = ?`,
+      [
+        1,
+        UsePublicTransit,
+        Carpool,
+        DriveLess,
+        MaintainVehicle,
+        RefinanceCar,
+        ShopForCarInsurance,
+        UseFuelRewards,
+        BikeOrWalk,
+        SwitchToFuelEfficientVehicle,
+        WorkFromHome
+      ]
+    );
+    res.status(201).json({ success: true });
+  }catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+router.post('/analysis-07-04', async (req, res) => {
+  const {
+    GenericMedications,
+    LowCostClinics,
+    UseUrgentCare,
+    AskForCashDiscounts,
+    ReviewHospitalBills,
+    TrackInsuranceClaims
+  } = req.body;
+  try{
+    await db.raw(`EXEC update_WaysToTrimBudget 
+      @ProfileID = ?, 
+      @GenericMedications = ?,
+      @LowCostClinics = ?,
+      @UseUrgentCare = ?,
+      @AskForCashDiscounts = ?,
+      @ReviewHospitalBills = ?,
+      @TrackInsuranceClaims = ?`,
+      [
+        1,
+        GenericMedications,
+        LowCostClinics,
+        UseUrgentCare,
+        AskForCashDiscounts,
+        ReviewHospitalBills,
+        TrackInsuranceClaims
+      ]
+    );
+    res.status(201).json({ success: true });
+  }catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }

@@ -7,6 +7,7 @@ import referenceRoutes from './routes/reference';
 import tableRoutes from './routes/tables';
 import valueRoutes from './routes/values';
 import pageRoutes from './routes/pages';
+import debtRoutes from './routes/debt';
 
 dotenv.config();
 
@@ -59,7 +60,8 @@ app.use('/ref', referenceRoutes);
 app.use('/tables', tableRoutes);
 app.use('/values', valueRoutes);
 app.use('/pages', pageRoutes);
+app.use('/debt', debtRoutes);
 
 app.listen(port, () => {
-    console.log(`Self Enrollment API listening on port ${port}`);
+  console.log(`Self Enrollment API listening on port ${port}`);
 });

@@ -829,7 +829,7 @@ router.get('/expenses-06-01', async (req, res) => {
 });
   
 router.post('/analysis-01-01', async (req, res) => {
-  const { formData } = req.body; 
+  const { DoYouFeelConfident, Email, DateOfBirth, EmailBudgetWorksheet, MailBudgetWorksheet } = req.body;
   try{
     await db.raw(
       `EXEC update_Profile 
@@ -841,11 +841,11 @@ router.post('/analysis-01-01', async (req, res) => {
         @MailBudgetWorksheet = ?`,
       [
         1,
-        formData.DoYouFeelConfident,
-        formData.Email,
-        formData.DateOfBirth,
-        formData.EmailBudgetWorksheet,
-        formData.MailBudgetWorksheet
+        DoYouFeelConfident,
+        Email,
+        DateOfBirth,
+        EmailBudgetWorksheet,
+        MailBudgetWorksheet
       ]
     );
     res.status(201).json({ success: true });
@@ -1233,6 +1233,31 @@ router.post('/analysis-07-02', async (req, res) => {
   }
 });
 
+router.get('/analysis-07-03', async (req, res) => {
+  try{
+    const data = await db('WaysToTrimBudget')
+      .select(
+        [
+          'UsePublicTransit', 
+          'Carpool', 
+          'DriveLess', 
+          'MaintainVehicle', 
+          'RefinanceCar', 
+          'ShopForCarInsurance', 
+          'UseFuelRewards', 
+          'BikeOrWalk', 
+          'SwitchToFuelEfficientVehicle', 
+          'WorkFromHome'
+        ]
+      )
+      .where({ ProfileID: 1 });
+    res.status(200).json(data[0]);
+  }catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 router.post('/analysis-07-03', async (req, res) => {
   const {
     UsePublicTransit,
@@ -1274,6 +1299,27 @@ router.post('/analysis-07-03', async (req, res) => {
       ]
     );
     res.status(201).json({ success: true });
+  }catch (err: any) {
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+router.get('/analysis-07-04', async (req, res) => {
+  try{
+    const data = await db('WaysToTrimBudget')
+      .select(
+        [
+          'GenericMedications', 
+          'LowCostClinics', 
+          'UseUrgentCare', 
+          'AskForCashDiscounts', 
+          'ReviewHospitalBills', 
+          'TrackInsuranceClaims'
+        ]
+      )
+      .where({ ProfileID: 1 });
+    res.status(200).json(data[0]);
   }catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });

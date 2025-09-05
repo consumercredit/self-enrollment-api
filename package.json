@@ -1,8 +1,8 @@
 {
   "name": "self-enrollment-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend API for ACCC Self Enrollment",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/app.ts",
@@ -26,7 +26,6 @@
     "express": "^5.1.0",
     "knex": "^3.1.0",
     "mssql": "^11.0.1",
-    "nodemon": "^3.1.10",
     "tedious": "^18.6.1"
   },
   "devDependencies": {
@@ -34,6 +33,7 @@
     "@types/express": "^5.0.3",
     "@types/mssql": "^9.1.7",
     "@types/node": "^24.0.14",
+    "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }

@@ -56,7 +56,7 @@ app.use(cors({
 
 app.get('/refHowDidYouHearAboutUs', async (req, res) => {
   try {
-    const result = await db.raw('EXEC get_refHowDidYouHearAboutUs');
+    //const result = await db.raw('EXEC get_refHowDidYouHearAboutUs');
     res.json("chubby dubby doo!");
   } catch (err: any) {
     res.status(500).json({ error: 'Database error', details: err.message });

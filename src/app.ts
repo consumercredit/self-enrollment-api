@@ -10,6 +10,7 @@ import pageRoutes from './routes/pages';
 import debtRoutes from './routes/debt';
 import navRoutes from './routes/navigation';
 import userRoutes from './routes/users';
+import { profileMiddleware } from './middleware/profile-middleware';
 
 dotenv.config();
 
@@ -54,9 +55,20 @@ app.use(express.json());
 const port = process.env.PORT || 3000;
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: [
+    'http://localhost:5173',
+    'https://myplan.consumercredit.com',
+    'https://accc-self-enrollment-grarhubebjanhmeb.eastus-01.azurewebsites.net'
+  ],
   credentials: true // Optional: only if you're sending cookies or auth headers
 }));
+
+// Apply profile middleware to all routes except users (which handles its own ProfileID logic)
+app.use('/pages', profileMiddleware);
+app.use('/nav', profileMiddleware);
+app.use('/debt', profileMiddleware);
+app.use('/tables', profileMiddleware);
+app.use('/values', profileMiddleware);
 
 app.use('/ref', referenceRoutes);
 app.use('/tables', tableRoutes);

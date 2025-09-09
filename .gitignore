@@ -1,3 +1,10 @@
 /node_modules/
 
 .env
+Question4.csv
+Question5.csv
+Question2.csv
+Question3.csv
+Question1.csv
+database-setup.sql
+AUTH0_INTEGRATION_COMPLETE.md

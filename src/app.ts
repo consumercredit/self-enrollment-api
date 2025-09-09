@@ -9,6 +9,7 @@ import valueRoutes from './routes/values';
 import pageRoutes from './routes/pages';
 import debtRoutes from './routes/debt';
 import navRoutes from './routes/navigation';
+import userRoutes from './routes/users';
 
 dotenv.config();
 
@@ -63,6 +64,7 @@ app.use('/values', valueRoutes);
 app.use('/pages', pageRoutes);
 app.use('/debt', debtRoutes);
 app.use('/nav', navRoutes);
+app.use('/users', userRoutes);
 
 app.listen(port, () => {
   console.log(`Self Enrollment API listening on port ${port}`);

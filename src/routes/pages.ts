@@ -12,7 +12,7 @@ router.post('/profile', async (req, res) => {
   try {
     const profileId = getProfileId(req);
     
-    // Update the Profile table with the basic information
+    // Use update_Profile stored procedure with ZipCode parameter (after you update the procedure)
     await db.raw(
       `EXEC update_Profile 
         @ProfileID = ?,

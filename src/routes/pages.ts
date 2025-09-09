@@ -2,12 +2,56 @@ import { Router } from 'express';
 import { db } from '../app';
 import type { NetWorthItem, ExpenseItem, IncomeItem } from '../types';
 import { updateNetWorthItem, updateExpense, updateOtherIncome } from '../functions';
+import { getProfileId } from '../middleware/profile-middleware';
 
 const router = Router();
+
+// Profile page endpoints
+router.post('/profile', async (req, res) => {
+  const { firstName, lastName, zipCode, phone, consentToTexts } = req.body;
+  try {
+    const profileId = getProfileId(req);
+    
+    // Update the Profile table with the basic information
+    await db.raw(
+      `EXEC update_Profile 
+        @ProfileID = ?,
+        @FirstName = ?,
+        @LastName = ?,
+        @Phone = ?,
+        @ConsentToTexts = ?,
+        @ZipCode = ?`,
+      [profileId, firstName, lastName, phone, consentToTexts, zipCode]
+    );
+    
+    res.status(201).json({ success: true });
+  } catch (err: any) {
+    console.error('Profile update error:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+router.get('/profile', async (req, res) => {
+  try {
+    const profileId = getProfileId(req);
+    
+    const data = await db('Profile')
+      .select('FirstName', 'LastName', 'Phone', 'ConsentToTexts', 'ZipCode')
+      .where({ ProfileID: profileId })
+      .first();
+      
+    res.status(200).json(data || {});
+  } catch (err: any) {
+    console.error('Profile fetch error:', err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
 
 router.post('/concerns-01-01', async (req, res) => {
   const { HowDidYouHearAboutUsID, TypeOfDebtID, creditCardDebtDetails } = req.body;
   try {
+    const profileId = getProfileId(req);
+    
     await db.raw(
       `EXEC update_Concerns 
         @ProfileID = ?,
@@ -17,7 +61,7 @@ router.post('/concerns-01-01', async (req, res) => {
         @PrimaryHardshipID = ?,
         @QualityOfLifeImpact = ?`,
       [
-        1, 
+        profileId, 
         TypeOfDebtID, 
         creditCardDebtDetails.AmountOwedID, 
         creditCardDebtDetails.PaymentStatusID, 
@@ -25,7 +69,7 @@ router.post('/concerns-01-01', async (req, res) => {
         creditCardDebtDetails.QualityOfLifeImpact
       ]
     );
-    await db.raw('EXEC update_Profile @ProfileID = ?, @HowDidYouHearAboutUsID = ?', [1, HowDidYouHearAboutUsID]);
+    await db.raw('EXEC update_Profile @ProfileID = ?, @HowDidYouHearAboutUsID = ?', [profileId, HowDidYouHearAboutUsID]);
     res.status(201).json({ success: true });
   } catch (err: any) {
     console.error(err);
@@ -35,12 +79,14 @@ router.post('/concerns-01-01', async (req, res) => {
   
 router.get('/concerns-01-01', async (req, res) => {
   try {
+    const profileId = getProfileId(req);
+    
     const concerns = await db('Concerns')
       .select('TypeOfDebtID', 'AmountOwedID', 'PaymentStatusID', 'PrimaryHardshipID', 'QualityOfLifeImpact')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     const profile = await db('Profile')
       .select('HowDidYouHearAboutUsID')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json({ concerns: concerns[0], profile: profile[0] });
   } catch (err: any) {
     res.status(500).json({ error: 'Database error', details: err.message });

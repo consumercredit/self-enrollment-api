@@ -9,3 +9,8 @@ Question1.csv
 database-setup.sql
 AUTH0_INTEGRATION_COMPLETE.md
 INTEGRATION_DEBUGGING.md
+update-profile-table.sql
+fixed-profile-update.sql
+add-zipcode-to-profile.sql
+add-columns-only.sql
+simple-profile-update.sql

@@ -64,7 +64,8 @@ router.post('/create', async (req, res) => {
 
     // Use direct insert since we know the existing schema
     const insertData: any = {
-      Email: email
+      Email: email,
+      FurthestPage: '/intro' // Initialize new users with /intro as starting point
     };
     
     if (firstName) insertData.FirstName = firstName;

@@ -439,15 +439,15 @@ router.get('/concerns-03-04', async (req, res) => {
 });
   
 router.post('/concerns-03-05', async (req, res) => {
-  const { ConsentToTexts, CanShareInfo, Phone } = req.body;
+  const { CanShareInfo } = req.body;
   try {
+    const profileId = getProfileId(req);
     await db.raw(
       `EXEC update_Demographics 
         @ProfileID = ?,
         @CanShareInfo = ?`,
-      [1, CanShareInfo]
+      [profileId, CanShareInfo]
     );
-    await db.raw('EXEC update_Profile @ProfileID = ?, @ConsentToTexts = ?, @Phone = ?', [1, ConsentToTexts, Phone]);
     res.status(201).json({ success: true });
   } catch (err: any) {
     console.error(err);
@@ -457,13 +457,11 @@ router.post('/concerns-03-05', async (req, res) => {
   
 router.get('/concerns-03-05', async (req, res) => {
   try {
+    const profileId = getProfileId(req);
     const demographics = await db('Demographics')
       .select('CanShareInfo')
-      .where({ ProfileID: 1 });
-    const profile = await db('Profile')
-      .select('ConsentToTexts', 'Phone')
-      .where({ ProfileID: 1 });
-    res.status(200).json({ demographics: demographics[0], profile: profile[0] });
+      .where({ ProfileID: profileId });
+    res.status(200).json({ demographics: demographics[0] || {} });
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ error: 'Database error', details: err.message });

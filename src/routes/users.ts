@@ -295,10 +295,54 @@ router.post('/reset-for-testing', async (req, res) => {
     
     const profileId = getProfileId(req);
     console.log('🧪 TESTING: Resetting user data for ProfileID:', profileId);
+    console.log('🧪 TESTING: ProfileID type:', typeof profileId);
+    console.log('🧪 TESTING: ProfileID value:', JSON.stringify(profileId));
+    
+    // Validate ProfileID
+    if (!profileId || isNaN(Number(profileId))) {
+      console.error('❌ Invalid ProfileID:', profileId);
+      return res.status(400).json({
+        error: 'Invalid ProfileID',
+        message: 'ProfileID is required and must be a valid number',
+        receivedProfileId: profileId,
+        type: typeof profileId
+      });
+    }
+    
+    const numericProfileId = Number(profileId);
+    console.log('🧪 TESTING: Numeric ProfileID:', numericProfileId);
+    
+    // Test database connection and stored procedure existence
+    try {
+      console.log('🧪 TESTING: Checking if stored procedure exists...');
+      const spCheck = await db.raw(`
+        SELECT name, type_desc, create_date, modify_date 
+        FROM sys.objects 
+        WHERE name = 'reset_UserForTesting' AND type = 'P'
+      `);
+      console.log('🧪 TESTING: Stored procedure check result:', spCheck);
+      
+      if (!spCheck || !spCheck[0] || spCheck[0].length === 0) {
+        console.error('❌ Stored procedure does not exist');
+        return res.status(500).json({
+          error: 'Stored procedure not found',
+          message: 'The reset_UserForTesting stored procedure does not exist in the database'
+        });
+      }
+      
+      console.log('✅ Stored procedure exists:', spCheck[0][0]);
+    } catch (spError: any) {
+      console.error('❌ Error checking stored procedure:', spError);
+      return res.status(500).json({
+        error: 'Database connection error',
+        message: 'Failed to check if stored procedure exists',
+        details: spError.message
+      });
+    }
     
     // Call the stored procedure to reset user data
-    console.log('🔍 Calling stored procedure with ProfileID:', profileId);
-    const result = await db.raw('EXEC reset_UserForTesting @ProfileID = ?', [profileId]);
+    console.log('🔍 Calling stored procedure with ProfileID:', numericProfileId);
+    const result = await db.raw('EXEC reset_UserForTesting @ProfileID = ?', [numericProfileId]);
     console.log('📊 Raw stored procedure result:', JSON.stringify(result, null, 2));
     console.log('📊 Result type:', typeof result);
     console.log('📊 Result length:', result ? result.length : 'null');

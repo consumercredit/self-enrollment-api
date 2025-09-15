@@ -297,22 +297,17 @@ router.post('/reset-for-testing', async (req, res) => {
     console.log('🧪 TESTING: Resetting user data for ProfileID:', profileId);
     
     // Call the stored procedure to reset user data
+    console.log('🔍 Calling stored procedure with ProfileID:', profileId);
     const result = await db.raw('EXEC reset_UserForTesting @ProfileID = ?', [profileId]);
+    console.log('📊 Stored procedure result:', result);
     
-    if (result && result.length > 0) {
-      const resetResult = result[0];
-      console.log('✅ User reset successful:', resetResult);
-      
-      res.status(200).json({
-        success: true,
-        message: 'User data reset successfully',
-        profileId: profileId,
-        furthestPage: '/intro',
-        result: resetResult
-      });
-    } else {
-      throw new Error('No result returned from reset procedure');
-    }
+    res.status(200).json({
+      success: true,
+      message: 'User data reset successfully',
+      profileId: profileId,
+      furthestPage: '/intro',
+      method: 'stored_procedure'
+    });
     
   } catch (err: any) {
     console.error('❌ Error resetting user for testing:', err);

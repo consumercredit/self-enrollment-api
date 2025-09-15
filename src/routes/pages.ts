@@ -405,6 +405,7 @@ router.post('/concerns-03-04', async (req, res) => {
     YearsUntilRetirement 
   } = req.body;
   try {
+    const profileId = getProfileId(req);
     await db.raw(
       `EXEC update_Demographics 
         @ProfileID = ?, 
@@ -816,6 +817,7 @@ router.get('/expenses-03-01', async (req, res) => {
 router.post('/expenses-03-01', async (req, res) => {
   const { expenses } = req.body;
   try{
+    const profileId = getProfileId(req);
     for (const exp of expenses) {
       await db.raw(
         `EXEC insert_Expenses 
@@ -859,6 +861,7 @@ router.get('/expenses-04-01', async (req, res) => {
 router.post('/expenses-04-01', async (req, res) => {
   const { expenses, adults, children } = req.body;
   try{
+    const profileId = getProfileId(req);
     for (const exp of expenses) {
       await db.raw(
         `EXEC insert_Expenses 
@@ -902,6 +905,7 @@ router.get('/expenses-06-01', async (req, res) => {
 router.post('/analysis-01-01', async (req, res) => {
   const { DoYouFeelConfident, Email, DateOfBirth, EmailBudgetWorksheet, MailBudgetWorksheet } = req.body;
   try{
+    const profileId = getProfileId(req);
     await db.raw(
       `EXEC update_Profile 
         @ProfileID = ?,
@@ -942,6 +946,7 @@ router.get('/analysis-01-01', async (req, res) => {
 router.post('/analysis-02-01', async (req, res) => {
   const { Savings, Cash, RetirementAccounts, Stocks, Cryptocurrency, Bonds, LifeInsurance } = req.body;
   try{
+    const profileId = getProfileId(req);
     await db.raw(`
       EXEC update_Savings 
       @ProfileID = ?,
@@ -1086,6 +1091,7 @@ router.post('/budget-shortfall', async (req, res) => {
     otherIncomes 
   } = req.body;
   try{
+    const profileId = getProfileId(req);
     housingExpenses.forEach((expense: ExpenseItem) => {
       updateExpense(expense);
   });
@@ -1354,6 +1360,7 @@ router.post('/analysis-07-03', async (req, res) => {
     WorkFromHome
   } = req.body;
   try{
+    const profileId = getProfileId(req);
     await db.raw(`EXEC update_WaysToTrimBudget 
       @ProfileID = ?, 
       @UsePublicTransit = ?,
@@ -1419,6 +1426,7 @@ router.post('/analysis-07-04', async (req, res) => {
     TrackInsuranceClaims
   } = req.body;
   try{
+    const profileId = getProfileId(req);
     await db.raw(`EXEC update_WaysToTrimBudget 
       @ProfileID = ?, 
       @GenericMedications = ?,

@@ -59,4 +59,15 @@ router.get('/TotalHouseholdNetIncome', async (req, res) => {
   }
 });
 
+router.get('/TrueSavingsAllocation', async (req, res) => {
+  try{
+    const profileId = getProfileId(req);
+    const data = await db.raw(`EXEC get_TrueSavingsAllocation @ProfileID = ?`, [profileId]);
+    res.status(200).json(data[0]);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
 export default router;

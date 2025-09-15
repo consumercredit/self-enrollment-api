@@ -156,9 +156,10 @@ router.post('/concerns-01-02', async (req, res) => {
   
 router.get('/concerns-01-02', async (req, res) => {
   try {
+    const profileId = getProfileId(req);
     const data = await db('Issues')
       .select('*')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
@@ -207,9 +208,10 @@ router.post('/concerns-01-03', async (req, res) => {
   
 router.get('/concerns-01-03', async (req, res) => {
   try {
+    const profileId = getProfileId(req);
     const data = await db('WaysToOvercome')
       .select('*')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
@@ -233,9 +235,10 @@ router.post('/concerns-02-01', async (req, res) => {
   
 router.get('/concerns-02-01', async (req, res) => {
   try {
+    const profileId = getProfileId(req);
     const data = await db('Profile')
       .select('NumberOfPeopleResponsibleFor', 'HasPartner')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
@@ -275,9 +278,10 @@ router.post('/concerns-03-01', async (req, res) => {
   
 router.get('/concerns-03-01', async (req, res) => {
   try {
+    const profileId = getProfileId(req);
     const data = await db('Demographics')
       .select('GenderID', 'MaritalID', 'HeadOfHousehold', 'Adults', 'Children', 'TotalPeopleInHousehold')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
@@ -335,12 +339,13 @@ router.post('/concerns-03-02', async (req, res) => {
   
 router.get('/concerns-03-02', async (req, res) => {
   try {
+    const profileId = getProfileId(req);
     const employment = await db('Employment')
       .select('EmploymentID', 'TypeOfWork', 'DoesSideWork', 'MilitaryID', 'PlanToLeaveMilitary')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     const sidework = await db('SideWork')
       .select('Zip', 'Employees', 'YearsEmployed', 'TypeOfBusinessID', 'RevenueID', 'TypeOfBusinessOther')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json({ employment: employment[0], sidework: sidework[0] });
   } catch (err: any) {
     console.error(err);
@@ -371,12 +376,13 @@ router.post('/concerns-03-03', async (req, res) => {
   
 router.get('/concerns-03-03', async (req, res) => {
   try {
+    const profileId = getProfileId(req);
     const demographics = await db('Demographics')
       .select('EducationID', 'OtherEducation', 'RaceID', 'IsHispanic')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     const profile = await db('Profile')
       .select('DateOfBirth')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json({ demographics: demographics[0], profile: profile[0] });
   } catch (err: any) {
     console.error(err);
@@ -422,6 +428,7 @@ router.post('/concerns-03-04', async (req, res) => {
   
 router.get('/concerns-03-04', async (req, res) => {
   try {
+    const profileId = getProfileId(req);
     const data = await db('Demographics')
       .select(
         'HousingID',
@@ -431,7 +438,7 @@ router.get('/concerns-03-04', async (req, res) => {
         'HasFiledForBankruptcy', 
         'YearsUntilRetirement'
       )
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
@@ -514,9 +521,10 @@ router.post('/concerns-04-01', async (req, res) => {
   
 router.get('/concerns-04-01', async (req, res) => {
   try {
+    const profileId = getProfileId(req);
     const data = await db('Goals')
       .select('PurchaseHome', 'SaveForRetirement', 'ContinueEducation', 'HaveEmergencySavings', 'FinanceChildsEducation', 'PayOffCollegeLoans', 'MakeHomeImprovements', 'BuyVacationHome', 'PurchaseNewVehicle', 'SavingForFuneral', 'HaveLifeInsurance', 'PayOffMortgage', 'Other')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
@@ -561,9 +569,10 @@ router.post('/concerns-05-01', async (req, res) => {
   
 router.get('/concerns-05-01', async (req, res) => {
   try {
+    const profileId = getProfileId(req);
     const data = await db('Habits')
       .select('*')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   } catch (err: any) {
     console.error(err);
@@ -573,18 +582,19 @@ router.get('/concerns-05-01', async (req, res) => {
   
 router.get('/income-01-01', async (req, res) => {
   try {
+    const profileId = getProfileId(req);
     const profile = await db('Profile')
       .select('DoYouHaveIncome', 'DoYouHaveSavings', 'HasPartner')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     const yourIncome = await db('YourIncome')
       .select('*')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     const yourPartnersIncome = await db('YourPartnersIncome')
       .select('*')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     const yourSavingsIncome = await db('YourSavingsIncome')
       .select('*')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json({ profile: profile[0], yourIncome: yourIncome[0], yourPartnersIncome: yourPartnersIncome[0], yourSavingsIncome: yourSavingsIncome[0] });
   } catch (err: any) {
     console.error(err);
@@ -682,10 +692,10 @@ router.post('/income-01-01', async (req, res) => {
   
 router.get('/income-02-01', async (req, res) => {
   try {
+    const profileId = getProfileId(req);
     const otherincome = await db('OtherIncome')
       .select('*')
-      .where({ ProfileID: 1 });
-    const profileId = getProfileId(req);
+      .where({ ProfileID: profileId });
     const totalgrossincome = await db.raw('EXEC get_TotalGrossMonthlyIncome @ProfileID = ?', [profileId]);
     const totalnetincome = await db.raw('EXEC get_TotalHouseholdNetIncome @ProfileID = ?', [profileId]);
     res.status(200).json({ 
@@ -764,12 +774,13 @@ router.post('/expenses-02-01', async (req, res) => {
   
 router.get('/expenses-02-01', async (req, res) => {
   try{
+    const profileId = getProfileId(req);
     const expenses = await db('Expenses')
       .select('*')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     const demographics = await db('Demographics')
       .select('LivingArrangementID')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json({ expenses: expenses, demographics: demographics[0] });
   }catch(err: any){
     console.error(err);
@@ -779,12 +790,13 @@ router.get('/expenses-02-01', async (req, res) => {
   
 router.get('/expenses-03-01', async (req, res) => {
   try{
+    const profileId = getProfileId(req);
     const demographics = await db('Demographics')
       .select('TotalPeopleInHousehold')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     const expenses = await db('Expenses')
       .select('*')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json({demographics: demographics[0], expenses: expenses});
   }catch(err: any){
     console.error(err);
@@ -821,12 +833,13 @@ router.post('/expenses-03-01', async (req, res) => {
   
 router.get('/expenses-04-01', async (req, res) => {
   try{
+    const profileId = getProfileId(req);
     const demographics = await db('Demographics')
       .select('Adults', 'Children')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     const expenses = await db('Expenses')
       .select('*')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json({demographics: demographics[0], expenses: expenses});
   }catch(err: any){
     console.error(err);
@@ -865,10 +878,10 @@ router.post('/expenses-04-01', async (req, res) => {
   
 router.get('/expenses-06-01', async (req, res) => {
   try{
-    const expenses = await db('Expenses').select('*').where({ ProfileID: 1 });
-    const securedDebt = await db('SecuredDebt').select('*').where({ ProfileID: 1 });
-    const unsecuredDebt = await db('UnsecuredDebt').select('*').where({ ProfileID: 1 });
     const profileId = getProfileId(req);
+    const expenses = await db('Expenses').select('*').where({ ProfileID: profileId });
+    const securedDebt = await db('SecuredDebt').select('*').where({ ProfileID: profileId });
+    const unsecuredDebt = await db('UnsecuredDebt').select('*').where({ ProfileID: profileId });
     const income = await db.raw(`EXEC get_TotalHouseholdNetIncome @ProfileID = ?`, [profileId]);
     res.status(200).json({expenses, securedDebt, unsecuredDebt, totalHouseholdNetIncome: income[0].TotalHouseholdNetIncome});
   }catch(err: any){
@@ -906,9 +919,10 @@ router.post('/analysis-01-01', async (req, res) => {
   
 router.get('/analysis-01-01', async (req, res) => {
   try{
+    const profileId = getProfileId(req);
     const data = await db('Profile')
       .select('DoYouFeelConfident', 'Email', 'DateOfBirth', 'EmailBudgetWorksheet', 'MailBudgetWorksheet')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   }catch(err: any){
     console.error(err);
@@ -949,9 +963,10 @@ router.post('/analysis-02-01', async (req, res) => {
   
 router.get('/analysis-02-01', async (req, res) => {
   try{
+    const profileId = getProfileId(req);
     const data = await db('Savings')
       .select('*')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   }catch(err: any){
     console.error(err);
@@ -1127,9 +1142,10 @@ router.post('/budget-shortfall', async (req, res) => {
   
 router.get('/analysis-06-01', async (req, res) => {
   try{
+    const profileId = getProfileId(req);
     const data = await db('Goals')
       .select('*')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   }catch(err: any){
     console.error(err);
@@ -1193,6 +1209,7 @@ router.post('/analysis-07-01', async (req, res) => {
 
 router.get('/analysis-07-01', async (req, res) => {
   try{
+    const profileId = getProfileId(req);
     const data = await db('WaysToTrimBudget')
       .select([
         'CookAtHome',
@@ -1208,7 +1225,7 @@ router.get('/analysis-07-01', async (req, res) => {
         'DitchGym', 
         'ShopSecondhand'
       ])
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   }catch(err: any){
     console.error(err);
@@ -1218,6 +1235,7 @@ router.get('/analysis-07-01', async (req, res) => {
   
 router.get('/analysis-07-02', async (req, res) => {
   try{
+    const profileId = getProfileId(req);
     const data = await db('WaysToTrimBudget')
       .select([
         'RefinanceMortgage',
@@ -1231,7 +1249,7 @@ router.get('/analysis-07-02', async (req, res) => {
         'CompareHomeInsurance',
         'UseUtilityAssistance'
       ])
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   }catch(err: any){
     console.error(err);
@@ -1289,6 +1307,7 @@ router.post('/analysis-07-02', async (req, res) => {
 
 router.get('/analysis-07-03', async (req, res) => {
   try{
+    const profileId = getProfileId(req);
     const data = await db('WaysToTrimBudget')
       .select(
         [
@@ -1304,7 +1323,7 @@ router.get('/analysis-07-03', async (req, res) => {
           'WorkFromHome'
         ]
       )
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   }catch (err: any) {
     console.error(err);
@@ -1361,6 +1380,7 @@ router.post('/analysis-07-03', async (req, res) => {
 
 router.get('/analysis-07-04', async (req, res) => {
   try{
+    const profileId = getProfileId(req);
     const data = await db('WaysToTrimBudget')
       .select(
         [
@@ -1372,7 +1392,7 @@ router.get('/analysis-07-04', async (req, res) => {
           'TrackInsuranceClaims'
         ]
       )
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   }catch (err: any) {
     console.error(err);
@@ -1417,9 +1437,10 @@ router.post('/analysis-07-04', async (req, res) => {
   
 router.get('/analysis-08-01', async (req, res) => {
   try{
+    const profileId = getProfileId(req);
     const profile = await db('Profile')
       .select('DebtToIncomeRatio', 'CreditUtilization')
-      .where({ ProfileID: 1 });
+      .where({ ProfileID: profileId });
     res.status(200).json({DebtToIncomeRatio: profile[0].DebtToIncomeRatio, CreditUtilization: profile[0].CreditUtilization});
   }catch(err: any){
     console.error(err);

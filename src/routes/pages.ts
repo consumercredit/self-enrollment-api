@@ -356,6 +356,7 @@ router.get('/concerns-03-02', async (req, res) => {
 router.post('/concerns-03-03', async (req, res) => {
   const { EducationID, OtherEducation, RaceID, IsHispanic, DateOfBirth } = req.body;
   try {
+    const profileId = getProfileId(req);
     await db.raw(
       `EXEC update_Demographics 
         @ProfileID = ?, 
@@ -363,9 +364,8 @@ router.post('/concerns-03-03', async (req, res) => {
         @OtherEducation = ?, 
         @RaceID = ?, 
         @IsHispanic = ?`,
-      [1, EducationID, OtherEducation, RaceID, IsHispanic]
+      [profileId, EducationID, OtherEducation, RaceID, IsHispanic]
     );
-    const profileId = getProfileId(req);
     await db.raw('EXEC update_Profile @ProfileID = ?, @DateOfBirth = ?', [profileId, DateOfBirth]);
     res.status(201).json({ success: true });
   } catch (err: any) {

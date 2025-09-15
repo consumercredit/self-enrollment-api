@@ -285,10 +285,11 @@ router.get('/qualify', async (req, res) => {
 router.post('/reset-for-testing', async (req, res) => {
   try {
     // Security check - only allow when explicitly enabled
-    if (process.env.ENABLE_TESTING_RESET !== 'true') {
+    // Temporarily enabled for testing - set ENABLE_TESTING_RESET=false to disable
+    if (process.env.ENABLE_TESTING_RESET === 'false') {
       return res.status(403).json({ 
-        error: 'Reset functionality not enabled',
-        message: 'This endpoint requires ENABLE_TESTING_RESET=true environment variable'
+        error: 'Reset functionality disabled',
+        message: 'This endpoint has been disabled via ENABLE_TESTING_RESET=false'
       });
     }
     

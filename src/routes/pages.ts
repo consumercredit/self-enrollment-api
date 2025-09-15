@@ -879,7 +879,6 @@ router.post('/expenses-04-01', async (req, res) => {
         ]
       );
     }
-    const profileId = getProfileId(req);
     await db.raw(`EXEC update_Demographics @ProfileID = ?, @Adults = ?, @Children = ?`, [profileId, adults, children]);
     res.status(201).json({ success: true });
   }catch(err: any){

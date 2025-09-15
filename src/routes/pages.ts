@@ -96,6 +96,7 @@ router.get('/concerns-01-01', async (req, res) => {
 router.post('/concerns-01-02', async (req, res) => {
   const { financialIssues } = req.body;
   try {
+    const profileId = getProfileId(req);
     await db.raw(
       `EXEC update_Issues 
         @ProfileID = ?,
@@ -122,7 +123,7 @@ router.post('/concerns-01-02', async (req, res) => {
         @MilitaryService = ?,
         @MilitaryServiceDescription = ?`,
       [
-        1,
+        profileId,
         financialIssues.JobLoss,
         financialIssues.IncomeReduction,
         financialIssues.Medical,
@@ -170,8 +171,9 @@ router.get('/concerns-01-02', async (req, res) => {
 router.post('/concerns-01-03', async (req, res) => {
   const { waysToOvercome } = req.body;
   try {
+    const profileId = getProfileId(req);
     await db.raw(
-      `EXEC update_WaysToOvercome
+      `EXEC update_WaysToOvercome 
         @ProfileID = ?,
         @CallingACCC = ?,
         @ContactedCreditors = ?,
@@ -185,7 +187,7 @@ router.post('/concerns-01-03', async (req, res) => {
         @Other = ?,
         @OtherDescription = ?`,
       [
-        1,
+        profileId,
         waysToOvercome.CallingACCC,
         waysToOvercome.ContactedCreditors,
         waysToOvercome.ContactedAttorney,
@@ -250,6 +252,7 @@ router.get('/concerns-02-01', async (req, res) => {
 router.post('/concerns-03-01', async (req, res) => {
   const { demoInfo } = req.body;
   try {
+    const profileId = getProfileId(req);
     await db.raw(
       `EXEC update_Demographics 
         @ProfileID = ?, 
@@ -260,7 +263,7 @@ router.post('/concerns-03-01', async (req, res) => {
         @Children = ?,
         @TotalPeopleInHousehold = ?`,
       [
-        1,
+        profileId,
         demoInfo.GenderID,
         demoInfo.MaritalID,
         demoInfo.HeadOfHousehold,
@@ -293,6 +296,7 @@ router.get('/concerns-03-01', async (req, res) => {
 router.post('/concerns-03-02', async (req, res) => {
   const { demoInfo } = req.body;
   try {
+    const profileId = getProfileId(req);
     await db.raw(
       `EXEC update_Employment 
         @ProfileID = ?, 
@@ -302,7 +306,7 @@ router.post('/concerns-03-02', async (req, res) => {
         @MilitaryID = ?, 
         @PlanToLeaveMilitary = ?`,
       [
-        1,
+        profileId,
         demoInfo.EmploymentID,
         demoInfo.TypeOfWork,
         demoInfo.DoesSideWork,
@@ -321,7 +325,7 @@ router.post('/concerns-03-02', async (req, res) => {
           @RevenueID = ?,
           @TypeOfBusinessOther = ?`,
         [
-          1,
+          profileId,
           demoInfo.SideWorkDetails.Zip,
           demoInfo.SideWorkDetails.Employees,
           demoInfo.SideWorkDetails.YearsEmployed,
@@ -411,7 +415,7 @@ router.post('/concerns-03-04', async (req, res) => {
         @HasFiledForBankruptcy = ?,
         @YearsUntilRetirement = ?`,
       [
-        1, 
+        profileId, 
         HousingID, 
         OtherHousing, 
         IsProficientInEnglish, 
@@ -480,6 +484,7 @@ router.get('/concerns-03-05', async (req, res) => {
 router.post('/concerns-04-01', async (req, res) => {
   const { budgetItems } = req.body;
   try {
+    const profileId = getProfileId(req);
     await db.raw(
       `EXEC update_Goals 
         @ProfileID = ?,
@@ -497,7 +502,7 @@ router.post('/concerns-04-01', async (req, res) => {
         @PayOffMortgage = ?,
         @Other = ?`,
       [
-        1,
+        profileId,
         budgetItems.PurchaseHome,
         budgetItems.SaveForRetirement,
         budgetItems.ContinueEducation,
@@ -536,6 +541,7 @@ router.get('/concerns-04-01', async (req, res) => {
 router.post('/concerns-05-01', async (req, res) => {
   const { spendingHabits } = req.body;
   try {
+    const profileId = getProfileId(req);
     await db.raw(
       `EXEC update_Habits 
         @ProfileID = ?,
@@ -549,7 +555,7 @@ router.post('/concerns-05-01', async (req, res) => {
         @CreditCardsToSupplementIncome = ?,
         @Other = ?`,
       [
-        1,
+        profileId,
         spendingHabits.OnlyWorryAboutToday,
         spendingHabits.KeepUpWithJoneses,
         spendingHabits.BuyBasedOnNeeds,
@@ -614,13 +620,14 @@ router.post('/income-01-01', async (req, res) => {
   } = req.body;
 
   try {
+    const profileId = getProfileId(req);
     await db.raw(
       `EXEC update_Profile
         @ProfileID = ?,
         @DoYouHaveIncome = ?,
         @DoYouHaveSavings = ?`,
       [
-        1,
+        profileId,
         DoYouHaveIncome,
         DoYouHaveSavings
       ]
@@ -637,7 +644,7 @@ router.post('/income-01-01', async (req, res) => {
           @WagesGarnished = ?,
           @PayrollDeductions = ?`,
         [
-          1,
+          profileId,
           yourIncome.PayPeriodID,
           yourIncome.GrossIncome,
           yourIncome.NetIncome,
@@ -657,7 +664,7 @@ router.post('/income-01-01', async (req, res) => {
         @NetIncome = ?,
         @PayrollDeductions = ?`,
         [
-          1,
+          profileId,
           yourPartnersIncome.PayPeriodID,
           yourPartnersIncome.GrossIncome,
           yourPartnersIncome.NetIncome,
@@ -675,7 +682,7 @@ router.post('/income-01-01', async (req, res) => {
           @SavingsAmount = ?,
           @GrossMonthlySavingsIncome = ?`,
         [
-          1,
+          profileId,
           yourSavingsIncome.HowLongUseSavings,
           yourSavingsIncome.HowLongUseSavingsPeriodID,
           yourSavingsIncome.SavingsAmount,
@@ -718,6 +725,7 @@ router.post('/income-02-01', async (req, res) => {
   }
 
   try {
+    const profileId = getProfileId(req);
     for (const item of incomeItems) {
       await db.raw(
         `EXEC insert_OtherIncome 
@@ -726,7 +734,7 @@ router.post('/income-02-01', async (req, res) => {
           @PayPeriodID = ?, 
           @Amount = ?`,
         [
-          1,
+          profileId,
           item.Section,
           item.PayPeriodID,
           item.Amount
@@ -758,7 +766,7 @@ router.post('/expenses-02-01', async (req, res) => {
           @Amount = ?,
           @Comment = ?`,
         [
-          1,
+          profileId,
           exp.Section,
           exp.PayPeriodID,
           exp.Amount,
@@ -817,7 +825,7 @@ router.post('/expenses-03-01', async (req, res) => {
           @Amount = ?,
           @Comment = ?`,
         [
-          1,
+          profileId,
           exp.Section,
           exp.PayPeriodID,
           exp.Amount,
@@ -860,7 +868,7 @@ router.post('/expenses-04-01', async (req, res) => {
           @Amount = ?,
           @Comment = ?`,
         [
-          1,
+          profileId,
           exp.Section,
           exp.PayPeriodID,
           exp.Amount,
@@ -903,7 +911,7 @@ router.post('/analysis-01-01', async (req, res) => {
         @EmailBudgetWorksheet = ?,
         @MailBudgetWorksheet = ?`,
       [
-        1,
+        profileId,
         DoYouFeelConfident,
         Email,
         DateOfBirth,
@@ -945,7 +953,7 @@ router.post('/analysis-02-01', async (req, res) => {
       @Bonds = ?,
       @LifeInsurance = ?`, 
       [
-        1,
+        profileId,
         Savings, 
         Cash,
         RetirementAccounts,
@@ -1095,7 +1103,7 @@ router.post('/budget-shortfall', async (req, res) => {
       @OtherDeductions = ?, 
       @PayrollDeductions = ?`,
       [
-        1,
+        profileId,
         yourIncome.PayPeriodID,
         yourIncome.GrossIncome,
         yourIncome.NetIncome,
@@ -1110,7 +1118,7 @@ router.post('/budget-shortfall', async (req, res) => {
       @NetIncome = ?, 
       @PayrollDeductions = ?`,
       [
-        1,
+        profileId,
         yourPartnersIncome.PayPeriodID,
         yourPartnersIncome.GrossIncome,
         yourPartnersIncome.NetIncome,
@@ -1124,7 +1132,7 @@ router.post('/budget-shortfall', async (req, res) => {
       @SavingsAmount = ?,
       @GrossMonthlySavingsIncome = ?`,
       [
-        1,
+        profileId,
         yourSavingsIncome.HowLongUseSavings,
         yourSavingsIncome.HowLongUseSavingsPeriodID,
         yourSavingsIncome.SavingsAmount,
@@ -1359,7 +1367,7 @@ router.post('/analysis-07-03', async (req, res) => {
       @SwitchToFuelEfficientVehicle = ?,
       @WorkFromHome = ?`,
       [
-        1,
+        profileId,
         UsePublicTransit,
         Carpool,
         DriveLess,
@@ -1420,7 +1428,7 @@ router.post('/analysis-07-04', async (req, res) => {
       @ReviewHospitalBills = ?,
       @TrackInsuranceClaims = ?`,
       [
-        1,
+        profileId,
         GenericMedications,
         LowCostClinics,
         UseUrgentCare,

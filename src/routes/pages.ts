@@ -222,9 +222,10 @@ router.get('/concerns-01-03', async (req, res) => {
 router.post('/concerns-02-01', async (req, res) => {
   const { NumberOfPeopleResponsibleFor, HasPartner } = req.body;
   try {
+    const profileId = getProfileId(req);
     await db.raw(
       'EXEC update_Profile @ProfileID = ?, @NumberOfPeopleResponsibleFor = ?, @HasPartner = ?',
-      [1, NumberOfPeopleResponsibleFor, HasPartner]
+      [profileId, NumberOfPeopleResponsibleFor, HasPartner]
     );
     res.status(201).json({ success: true });
   } catch (err: any) {
@@ -1022,13 +1023,13 @@ router.get('/analysis-05-01', async (req, res) => {
 router.post('/analysis-05-01', async (req, res) => {
   const { assets, liabilities, NetWorth } = req.body;
   try{
+    const profileId = getProfileId(req);
     assets.forEach((asset: NetWorthItem) => {
-      updateNetWorthItem(asset, 1, "asset");
+      updateNetWorthItem(asset, profileId, "asset");
   });
     liabilities.forEach((liability: NetWorthItem) => {
-      updateNetWorthItem(liability, 1, "liability");
+      updateNetWorthItem(liability, profileId, "liability");
   });
-    const profileId = getProfileId(req);
     await db.raw('EXEC update_Profile @ProfileID = ?, @NetWorth = ?', [profileId, NetWorth]);
     res.status(201).json({success: true});
   }catch(err: any){

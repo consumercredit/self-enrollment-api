@@ -284,11 +284,11 @@ router.get('/qualify', async (req, res) => {
 // WARNING: This endpoint should only be available in development/testing environments
 router.post('/reset-for-testing', async (req, res) => {
   try {
-    // Security check - only allow in development
-    if (process.env.NODE_ENV === 'production') {
+    // Security check - only allow when explicitly enabled
+    if (process.env.ENABLE_TESTING_RESET !== 'true') {
       return res.status(403).json({ 
-        error: 'Reset functionality not available in production',
-        message: 'This endpoint is only available in development/testing environments'
+        error: 'Reset functionality not enabled',
+        message: 'This endpoint requires ENABLE_TESTING_RESET=true environment variable'
       });
     }
     

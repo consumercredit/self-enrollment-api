@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { db } from '../app';
+import { getProfileId } from '../middleware/profile-middleware';
 
 const router = Router();
 
@@ -275,6 +276,49 @@ router.get('/qualify', async (req, res) => {
       email: email,
       seQualify: true, // Default to true for self-enrollment API users
       redirectUrl: 'https://myplan.consumercredit.com/'
+    });
+  }
+});
+
+// TESTING ONLY: Reset user data for testing purposes
+// WARNING: This endpoint should only be available in development/testing environments
+router.post('/reset-for-testing', async (req, res) => {
+  try {
+    // Security check - only allow in development
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({ 
+        error: 'Reset functionality not available in production',
+        message: 'This endpoint is only available in development/testing environments'
+      });
+    }
+    
+    const profileId = getProfileId(req);
+    console.log('🧪 TESTING: Resetting user data for ProfileID:', profileId);
+    
+    // Call the stored procedure to reset user data
+    const result = await db.raw('EXEC reset_UserForTesting @ProfileID = ?', [profileId]);
+    
+    if (result && result.length > 0) {
+      const resetResult = result[0];
+      console.log('✅ User reset successful:', resetResult);
+      
+      res.status(200).json({
+        success: true,
+        message: 'User data reset successfully',
+        profileId: profileId,
+        furthestPage: '/intro',
+        result: resetResult
+      });
+    } else {
+      throw new Error('No result returned from reset procedure');
+    }
+    
+  } catch (err: any) {
+    console.error('❌ Error resetting user for testing:', err);
+    res.status(500).json({ 
+      error: 'Failed to reset user data', 
+      details: err.message,
+      profileId: req.profileId || 'unknown'
     });
   }
 });

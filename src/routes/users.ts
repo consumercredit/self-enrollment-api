@@ -280,6 +280,52 @@ router.get('/qualify', async (req, res) => {
   }
 });
 
+// Simple test endpoint to verify API is working
+router.get('/test-api', async (req, res) => {
+  try {
+    res.status(200).json({
+      success: true,
+      message: 'API is working',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'unknown'
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      error: 'API test failed',
+      details: err.message
+    });
+  }
+});
+
+// Simple test endpoint to verify stored procedure exists
+router.get('/test-stored-procedure', async (req, res) => {
+  try {
+    const spCheck = await db.raw(`
+      SELECT name, type_desc, create_date, modify_date 
+      FROM sys.objects 
+      WHERE name = 'reset_UserForTesting' AND type = 'P'
+    `);
+    
+    if (spCheck && spCheck[0] && spCheck[0].length > 0) {
+      res.status(200).json({
+        success: true,
+        message: 'Stored procedure exists',
+        procedure: spCheck[0][0]
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'Stored procedure not found'
+      });
+    }
+  } catch (err: any) {
+    res.status(500).json({
+      error: 'Database test failed',
+      details: err.message
+    });
+  }
+});
+
 // TESTING ONLY: Reset user data for testing purposes
 // WARNING: This endpoint should only be available in development/testing environments
 router.post('/reset-for-testing', async (req, res) => {
@@ -293,7 +339,19 @@ router.post('/reset-for-testing', async (req, res) => {
       });
     }
     
-    const profileId = getProfileId(req);
+    // Get ProfileID from header (like other endpoints do)
+    const profileIdHeader = req.headers['x-profile-id'];
+    console.log('🧪 TESTING: Raw ProfileID header:', profileIdHeader);
+    
+    if (!profileIdHeader) {
+      console.error('❌ No ProfileID header provided');
+      return res.status(400).json({
+        error: 'Missing ProfileID',
+        message: 'x-profile-id header is required'
+      });
+    }
+    
+    const profileId = parseInt(profileIdHeader as string, 10);
     console.log('🧪 TESTING: Resetting user data for ProfileID:', profileId);
     console.log('🧪 TESTING: ProfileID type:', typeof profileId);
     console.log('🧪 TESTING: ProfileID value:', JSON.stringify(profileId));

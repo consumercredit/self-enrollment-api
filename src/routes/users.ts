@@ -301,13 +301,37 @@ router.post('/reset-for-testing', async (req, res) => {
     const result = await db.raw('EXEC reset_UserForTesting @ProfileID = ?', [profileId]);
     console.log('📊 Stored procedure result:', result);
     
-    res.status(200).json({
-      success: true,
-      message: 'User data reset successfully',
-      profileId: profileId,
-      furthestPage: '/intro',
-      method: 'stored_procedure'
-    });
+    // Check the stored procedure result
+    if (result && result.length > 0 && result[0].length > 0) {
+      const procedureResult = result[0][0]; // First row of first result set
+      console.log('📋 Procedure result details:', procedureResult);
+      
+      if (procedureResult.Status === 'SUCCESS') {
+        res.status(200).json({
+          success: true,
+          message: procedureResult.Message || 'User data reset successfully',
+          profileId: procedureResult.ProfileID || profileId,
+          email: procedureResult.Email,
+          furthestPage: procedureResult.NewFurthestPage || '/intro',
+          method: 'stored_procedure'
+        });
+      } else {
+        // Stored procedure returned an error
+        console.error('❌ Stored procedure returned error:', procedureResult);
+        res.status(400).json({
+          error: 'Reset failed',
+          message: procedureResult.Message || 'Unknown error from stored procedure',
+          details: procedureResult
+        });
+      }
+    } else {
+      // No result returned from stored procedure
+      console.error('❌ No result returned from stored procedure');
+      res.status(500).json({
+        error: 'No result returned from reset procedure',
+        message: 'The stored procedure executed but returned no data'
+      });
+    }
     
   } catch (err: any) {
     console.error('❌ Error resetting user for testing:', err);

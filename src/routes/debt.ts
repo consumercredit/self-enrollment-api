@@ -1,13 +1,15 @@
 import { Router } from 'express';
 import { db } from '../app';
+import { getProfileId } from '../middleware/profile-middleware';
 
 const router = Router();
 
 router.get('/SecuredDebt', async (req, res) => {
     try {
+        const profileId = getProfileId(req);
         const data = await db('SecuredDebt')
             .select('*')
-            .where({ ProfileID: 1 });
+            .where({ ProfileID: profileId });
         res.status(200).json(data);
     } catch (err: any) {
         console.error(err);
@@ -57,6 +59,7 @@ router.post('/SecuredDebt', async (req, res) => {
     } = req.body;
 
     try {
+        const profileId = getProfileId(req);
         await db.raw(
             `EXEC insert_SecuredDebt 
                 @ProfileID = ?, 
@@ -67,7 +70,7 @@ router.post('/SecuredDebt', async (req, res) => {
                 @CurrentValue = ?, 
                 @BalanceOwed = ?`,
             [
-                1,
+                profileId,
                 TypeID,
                 MonthlyPayment,
                 AccountHolderID,
@@ -76,7 +79,7 @@ router.post('/SecuredDebt', async (req, res) => {
                 BalanceOwed
             ]
         );
-        const RowID = await db('SecuredDebt').where({ ProfileID: 1 }).max('RowID as NewRowID');
+        const RowID = await db('SecuredDebt').where({ ProfileID: profileId }).max('RowID as NewRowID');
         res.status(201).json(RowID[0]);
     } catch (err: any) {
         console.error(err);
@@ -100,9 +103,10 @@ router.delete('/SecuredDebt', async (req, res) => {
 
 router.get('/UnsecuredDebt', async (req, res) => {
     try {
+        const profileId = getProfileId(req);
         const data = await db('UnsecuredDebt')
             .select('*')
-            .where({ ProfileID: 1 });
+            .where({ ProfileID: profileId });
         res.status(200).json(data);
     } catch (err: any) {
         console.error(err);
@@ -160,6 +164,7 @@ router.post('/UnsecuredDebt', async (req, res) => {
     } = req.body;
 
     try {
+        const profileId = getProfileId(req);
         await db.raw(
             `EXEC insert_UnsecuredDebt 
                 @ProfileID = ?, 
@@ -172,7 +177,7 @@ router.post('/UnsecuredDebt', async (req, res) => {
                 @OtherCreditor = ?,
                 @InterestRate = ?`,
             [
-                1,
+                profileId,
                 CreditorID,
                 DebtTypeID,
                 AccountNumber,
@@ -183,7 +188,7 @@ router.post('/UnsecuredDebt', async (req, res) => {
                 InterestRate
             ]
         );
-        const RowID = await db('UnsecuredDebt').where({ ProfileID: 1 }).max('RowID as NewRowID');
+        const RowID = await db('UnsecuredDebt').where({ ProfileID: profileId }).max('RowID as NewRowID');
         res.status(201).json(RowID[0]);
     } catch (err: any) {
         console.error(err);

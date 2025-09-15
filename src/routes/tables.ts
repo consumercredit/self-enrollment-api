@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { db } from '../app';
+import { getProfileId } from '../middleware/profile-middleware';
 
 const router = Router();
 
 router.get('/WaysToTrimBudget', async (req, res) => {
   try{
-    const data = await db.raw(`EXEC get_WaysToTrimBudget @ProfileID = ?`, [1]);
+    const profileId = getProfileId(req);
+    const data = await db.raw(`EXEC get_WaysToTrimBudget @ProfileID = ?`, [profileId]);
     res.status(200).json(data[0]);
   }catch(err: any){
     console.error(err);

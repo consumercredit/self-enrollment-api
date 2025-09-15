@@ -360,7 +360,8 @@ router.post('/concerns-03-03', async (req, res) => {
         @IsHispanic = ?`,
       [1, EducationID, OtherEducation, RaceID, IsHispanic]
     );
-    await db.raw('EXEC update_Profile @ProfileID = ?, @DateOfBirth = ?', [1, DateOfBirth]);
+    const profileId = getProfileId(req);
+    await db.raw('EXEC update_Profile @ProfileID = ?, @DateOfBirth = ?', [profileId, DateOfBirth]);
     res.status(201).json({ success: true });
   } catch (err: any) {
     console.error(err);
@@ -684,8 +685,9 @@ router.get('/income-02-01', async (req, res) => {
     const otherincome = await db('OtherIncome')
       .select('*')
       .where({ ProfileID: 1 });
-    const totalgrossincome = await db.raw('EXEC get_TotalGrossMonthlyIncome @ProfileID = ?', [1]);
-    const totalnetincome = await db.raw('EXEC get_TotalHouseholdNetIncome @ProfileID = ?', [1]);
+    const profileId = getProfileId(req);
+    const totalgrossincome = await db.raw('EXEC get_TotalGrossMonthlyIncome @ProfileID = ?', [profileId]);
+    const totalnetincome = await db.raw('EXEC get_TotalHouseholdNetIncome @ProfileID = ?', [profileId]);
     res.status(200).json({ 
       otherincome: otherincome,
       totalgrossincome: totalgrossincome[0].TotalGrossMonthlyIncome,
@@ -734,7 +736,8 @@ router.post('/income-02-01', async (req, res) => {
 router.post('/expenses-02-01', async (req, res) => {
   const { expenses, LivingArrangementID } = req.body;
   try{
-    await db.raw(`EXEC update_Demographics @ProfileID = ?, @LivingArrangementID = ?`, [1, LivingArrangementID]);
+    const profileId = getProfileId(req);
+    await db.raw(`EXEC update_Demographics @ProfileID = ?, @LivingArrangementID = ?`, [profileId, LivingArrangementID]);
     for (const exp of expenses) {
       await db.raw(
         `EXEC insert_Expenses 
@@ -851,7 +854,8 @@ router.post('/expenses-04-01', async (req, res) => {
         ]
       );
     }
-    await db.raw(`EXEC update_Demographics @ProfileID = ?, @Adults = ?, @Children = ?`, [1, adults, children]);
+    const profileId = getProfileId(req);
+    await db.raw(`EXEC update_Demographics @ProfileID = ?, @Adults = ?, @Children = ?`, [profileId, adults, children]);
     res.status(201).json({ success: true });
   }catch(err: any){
     console.error(err);
@@ -864,7 +868,8 @@ router.get('/expenses-06-01', async (req, res) => {
     const expenses = await db('Expenses').select('*').where({ ProfileID: 1 });
     const securedDebt = await db('SecuredDebt').select('*').where({ ProfileID: 1 });
     const unsecuredDebt = await db('UnsecuredDebt').select('*').where({ ProfileID: 1 });
-    const income = await db.raw(`EXEC get_TotalHouseholdNetIncome @ProfileID = ?`, [1]);
+    const profileId = getProfileId(req);
+    const income = await db.raw(`EXEC get_TotalHouseholdNetIncome @ProfileID = ?`, [profileId]);
     res.status(200).json({expenses, securedDebt, unsecuredDebt, totalHouseholdNetIncome: income[0].TotalHouseholdNetIncome});
   }catch(err: any){
     console.error(err);
@@ -956,10 +961,11 @@ router.get('/analysis-02-01', async (req, res) => {
   
 router.get('/analysis-04-01', async (req, res) => {
   try{
-    const GrossMonthlyIncome = await db.raw(`EXEC get_TotalGrossMonthlyIncome @ProfileID = ?`, [1]);
-    const RecurringMonthlyDebt = await db.raw(`EXEC get_RecurringMonthlyDebt @ProfileID = ?`, [1]);
-    const TotalCreditLimit = await db.raw(`EXEC get_TotalCreditLimit @ProfileID = ?`, [1]);
-    const TotalUnsecuredBalance = await db.raw(`EXEC get_TotalUnsecuredBalance @ProfileID = ?`, [1]);
+    const profileId = getProfileId(req);
+    const GrossMonthlyIncome = await db.raw(`EXEC get_TotalGrossMonthlyIncome @ProfileID = ?`, [profileId]);
+    const RecurringMonthlyDebt = await db.raw(`EXEC get_RecurringMonthlyDebt @ProfileID = ?`, [profileId]);
+    const TotalCreditLimit = await db.raw(`EXEC get_TotalCreditLimit @ProfileID = ?`, [profileId]);
+    const TotalUnsecuredBalance = await db.raw(`EXEC get_TotalUnsecuredBalance @ProfileID = ?`, [profileId]);
     res.status(200).json(
       {
         GrossMonthlyIncome: GrossMonthlyIncome[0].TotalGrossMonthlyIncome,
@@ -977,7 +983,8 @@ router.get('/analysis-04-01', async (req, res) => {
 router.post('/analysis-04-01', async (req, res) => {
   const { DebtToIncomeRatio, CreditUtilization } = req.body;
   try{
-    await db.raw(`EXEC update_Profile @ProfileID = ?, @DebtToIncomeRatio = ?, @CreditUtilization = ?`, [1, DebtToIncomeRatio, CreditUtilization]);
+    const profileId = getProfileId(req);
+    await db.raw(`EXEC update_Profile @ProfileID = ?, @DebtToIncomeRatio = ?, @CreditUtilization = ?`, [profileId, DebtToIncomeRatio, CreditUtilization]);
     res.status(201).json({success: true});
   }catch(err: any){
     console.error(err);
@@ -987,8 +994,9 @@ router.post('/analysis-04-01', async (req, res) => {
   
 router.get('/analysis-05-01', async (req, res) => {
   try{
-    const assets = await db.raw(`EXEC get_Assets @ProfileID = ?`, [1]);
-    const liabilities = await db.raw(`EXEC get_Liabilities @ProfileID = ?`, [1]);
+    const profileId = getProfileId(req);
+    const assets = await db.raw(`EXEC get_Assets @ProfileID = ?`, [profileId]);
+    const liabilities = await db.raw(`EXEC get_Liabilities @ProfileID = ?`, [profileId]);
     res.status(200).json({assets: assets, liabilities: liabilities});
   }catch(err: any){
     console.error(err);
@@ -1005,7 +1013,8 @@ router.post('/analysis-05-01', async (req, res) => {
     liabilities.forEach((liability: NetWorthItem) => {
       updateNetWorthItem(liability, 1, "liability");
   });
-    await db.raw('EXEC update_Profile @ProfileID = ?, @NetWorth = ?', [1, NetWorth]);
+    const profileId = getProfileId(req);
+    await db.raw('EXEC update_Profile @ProfileID = ?, @NetWorth = ?', [profileId, NetWorth]);
     res.status(201).json({success: true});
   }catch(err: any){
     console.error(err);
@@ -1015,14 +1024,15 @@ router.post('/analysis-05-01', async (req, res) => {
   
 router.get('/budget-shortfall', async (req, res) => {
   try{
-    const profile = await db.raw('EXEC get_Profile @ProfileID = ?', [1]);
-    const securedDebt = await db.raw('EXEC get_TotalSecuredMonthlyPayment @ProfileID = ?', [1]);
-    const unsecuredDebt = await db.raw('EXEC get_TotalUnsecuredMonthlyPayment @ProfileID = ?', [1]);
-    const expenses = await db.raw('EXEC get_Expenses @ProfileID = ?', [1]);
-    const yourIncome = await db.raw('EXEC get_YourIncome @ProfileID = ?', [1]);
-    const yourPartnersIncome = await db.raw('EXEC get_YourPartnersIncome @ProfileID = ?', [1]);
-    const yourSavingsIncome = await db.raw('EXEC get_YourSavingsIncome @ProfileID = ?', [1]);
-    const otherIncome = await db.raw('EXEC get_OtherIncome @ProfileID = ?', [1]);
+    const profileId = getProfileId(req);
+    const profile = await db.raw('EXEC get_Profile @ProfileID = ?', [profileId]);
+    const securedDebt = await db.raw('EXEC get_TotalSecuredMonthlyPayment @ProfileID = ?', [profileId]);
+    const unsecuredDebt = await db.raw('EXEC get_TotalUnsecuredMonthlyPayment @ProfileID = ?', [profileId]);
+    const expenses = await db.raw('EXEC get_Expenses @ProfileID = ?', [profileId]);
+    const yourIncome = await db.raw('EXEC get_YourIncome @ProfileID = ?', [profileId]);
+    const yourPartnersIncome = await db.raw('EXEC get_YourPartnersIncome @ProfileID = ?', [profileId]);
+    const yourSavingsIncome = await db.raw('EXEC get_YourSavingsIncome @ProfileID = ?', [profileId]);
+    const otherIncome = await db.raw('EXEC get_OtherIncome @ProfileID = ?', [profileId]);
     res.status(200).json(
       {
         profile: profile[0],

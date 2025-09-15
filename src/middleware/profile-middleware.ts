@@ -33,10 +33,13 @@ export const profileMiddleware = (req: Request, res: Response, next: NextFunctio
       profileId = parseInt(req.headers['x-profile-id'] as string, 10);
     }
 
-    // 4. Fallback to 1 for backward compatibility
+    // 4. Require valid ProfileID - no fallbacks for financial data
     if (!profileId || isNaN(profileId)) {
-      console.warn('No valid ProfileID provided, using fallback ProfileID = 1');
-      profileId = 1;
+      console.error('🚨 SECURITY: No valid ProfileID provided for financial data access');
+      return res.status(401).json({ 
+        error: 'Unauthorized: Valid ProfileID required for financial data access',
+        details: 'User must be properly authenticated'
+      });
     }
 
     // Add profileId to the request object
@@ -45,10 +48,11 @@ export const profileMiddleware = (req: Request, res: Response, next: NextFunctio
     console.log(`Request to ${req.path} using ProfileID: ${profileId}`);
     next();
   } catch (error) {
-    console.error('Profile middleware error:', error);
-    // Fallback to ProfileID = 1 on error
-    req.profileId = 1;
-    next();
+    console.error('🚨 SECURITY: Profile middleware error:', error);
+    return res.status(500).json({ 
+      error: 'Authentication error',
+      details: 'Unable to verify user identity'
+    });
   }
 };
 
@@ -56,5 +60,8 @@ export const profileMiddleware = (req: Request, res: Response, next: NextFunctio
  * Helper function to get ProfileID from request (for use in route handlers)
  */
 export const getProfileId = (req: Request): number => {
-  return req.profileId || 1;
+  if (!req.profileId) {
+    throw new Error('🚨 SECURITY: No ProfileID available - user not properly authenticated');
+  }
+  return req.profileId;
 };

@@ -977,7 +977,7 @@ router.get('/analysis-01-01', async (req, res) => {
 });
   
 router.post('/analysis-02-01', async (req, res) => {
-  const { Savings, Cash, RetirementAccounts, Stocks, Cryptocurrency, Bonds, LifeInsurance } = req.body;
+  const { Savings, Cash, RetirementAccounts, Stocks, Cryptocurrency, Bonds, LifeInsurance, MonthlySavingsContribution } = req.body;
   try{
     const profileId = getProfileId(req);
     await db.raw(`
@@ -989,7 +989,8 @@ router.post('/analysis-02-01', async (req, res) => {
       @Stocks = ?,
       @Cryptocurrency = ?,
       @Bonds = ?,
-      @LifeInsurance = ?`, 
+      @LifeInsurance = ?,
+      @MonthlySavingsContribution = ?`, 
       [
         profileId,
         Savings, 
@@ -998,7 +999,8 @@ router.post('/analysis-02-01', async (req, res) => {
         Stocks,
         Cryptocurrency,
         Bonds,
-        LifeInsurance
+        LifeInsurance,
+        MonthlySavingsContribution
       ]
     );
     res.status(201).json({ success: true });

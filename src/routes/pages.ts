@@ -890,13 +890,47 @@ router.post('/expenses-04-01', async (req, res) => {
 router.get('/expenses-06-01', async (req, res) => {
   try{
     const profileId = getProfileId(req);
+    console.log('🔍 expenses-06-01: Getting data for ProfileID:', profileId);
+    
     const expenses = await db('Expenses').select('*').where({ ProfileID: profileId });
     const securedDebt = await db('SecuredDebt').select('*').where({ ProfileID: profileId });
     const unsecuredDebt = await db('UnsecuredDebt').select('*').where({ ProfileID: profileId });
+    
+    console.log('📊 Raw income query result for ProfileID:', profileId);
     const income = await db.raw(`EXEC get_TotalHouseholdNetIncome @ProfileID = ?`, [profileId]);
-    res.status(200).json({expenses, securedDebt, unsecuredDebt, totalHouseholdNetIncome: income[0].TotalHouseholdNetIncome});
+    console.log('📊 Income stored procedure result:', income);
+    console.log('📊 Income[0]:', income[0]);
+    console.log('📊 TotalHouseholdNetIncome value:', income[0]?.TotalHouseholdNetIncome);
+    
+    // Let's also check what income data exists
+    const yourIncome = await db('YourIncome').select('*').where({ ProfileID: profileId });
+    const partnerIncome = await db('YourPartnersIncome').select('*').where({ ProfileID: profileId });
+    const savingsIncome = await db('YourSavingsIncome').select('*').where({ ProfileID: profileId });
+    const otherIncome = await db('OtherIncome').select('*').where({ ProfileID: profileId });
+    
+    console.log('📊 Raw income data check:', {
+      yourIncome,
+      partnerIncome, 
+      savingsIncome,
+      otherIncome
+    });
+    
+    res.status(200).json({
+      expenses, 
+      securedDebt, 
+      unsecuredDebt, 
+      totalHouseholdNetIncome: income[0]?.TotalHouseholdNetIncome,
+      debug: {
+        profileId,
+        incomeResult: income[0],
+        hasYourIncome: yourIncome.length > 0,
+        hasPartnerIncome: partnerIncome.length > 0,
+        hasSavingsIncome: savingsIncome.length > 0,
+        hasOtherIncome: otherIncome.length > 0
+      }
+    });
   }catch(err: any){
-    console.error(err);
+    console.error('❌ expenses-06-01 error:', err);
     res.status(500).json({ error: 'Database error', details: err.message });
   }
 });

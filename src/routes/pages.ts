@@ -483,7 +483,7 @@ router.get('/concerns-03-05', async (req, res) => {
 });
   
 router.post('/concerns-04-01', async (req, res) => {
-  const { budgetItems } = req.body;
+  const { budgetItems, otherGoalDescription } = req.body;
   try {
     const profileId = getProfileId(req);
     await db.raw(
@@ -501,7 +501,8 @@ router.post('/concerns-04-01', async (req, res) => {
         @SavingForFuneral = ?,
         @HaveLifeInsurance = ?,
         @PayOffMortgage = ?,
-        @Other = ?`,
+        @Other = ?,
+        @OtherDescription = ?`,
       [
         profileId,
         budgetItems.PurchaseHome,
@@ -516,7 +517,8 @@ router.post('/concerns-04-01', async (req, res) => {
         budgetItems.SavingForFuneral,
         budgetItems.HaveLifeInsurance,
         budgetItems.PayOffMortgage,
-        budgetItems.Other
+        budgetItems.Other,
+        otherGoalDescription || null
       ]
     );
     res.status(201).json({ success: true });
@@ -530,7 +532,7 @@ router.get('/concerns-04-01', async (req, res) => {
   try {
     const profileId = getProfileId(req);
     const data = await db('Goals')
-      .select('PurchaseHome', 'SaveForRetirement', 'ContinueEducation', 'HaveEmergencySavings', 'FinanceChildsEducation', 'PayOffCollegeLoans', 'MakeHomeImprovements', 'BuyVacationHome', 'PurchaseNewVehicle', 'SavingForFuneral', 'HaveLifeInsurance', 'PayOffMortgage', 'Other')
+      .select('PurchaseHome', 'SaveForRetirement', 'ContinueEducation', 'HaveEmergencySavings', 'FinanceChildsEducation', 'PayOffCollegeLoans', 'MakeHomeImprovements', 'BuyVacationHome', 'PurchaseNewVehicle', 'SavingForFuneral', 'HaveLifeInsurance', 'PayOffMortgage', 'Other', 'OtherDescription')
       .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   } catch (err: any) {

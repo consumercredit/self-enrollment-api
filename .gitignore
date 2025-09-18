@@ -16,3 +16,5 @@ add-columns-only.sql
 simple-profile-update.sql
 fix-existing-null-users.sql
 create-reset-stored-procedure.sql
+fix-allocation-calculation.sql
+add-other-goal-description.sql

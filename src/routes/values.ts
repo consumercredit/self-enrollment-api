@@ -7,10 +7,7 @@ const router = Router();
 router.get('/TotalExpenses', async (req, res) => {
   try{
     const profileId = getProfileId(req);
-    console.log('🔍 /values/TotalExpenses: Getting expenses for ProfileID:', profileId);
     const data = await db.raw(`EXEC get_TotalExpenses_ByCategory @ProfileID = ?`, [profileId]);
-    console.log('📊 get_TotalExpenses_ByCategory stored procedure result:', data);
-    console.log('📊 Returning data[0]:', data[0]);
     res.status(200).json(data[0]);
   }catch(err: any){
     console.error('❌ /values/TotalExpenses error:', err);
@@ -21,10 +18,7 @@ router.get('/TotalExpenses', async (req, res) => {
 router.get('/Allocations', async (req, res) => {
     try{
       const profileId = getProfileId(req);
-      console.log('🔍 /values/Allocations: Getting allocations for ProfileID:', profileId);
       const data = await db.raw(`EXEC get_Allocations @ProfileID = ?`, [profileId]);
-      console.log('📊 get_Allocations stored procedure result:', data);
-      console.log('📊 Returning data[0]:', data[0]);
       res.status(200).json(data[0]);
     }catch(err: any){
       console.error('❌ /values/Allocations error:', err);

@@ -45,7 +45,7 @@ export const profileMiddleware = (req: Request, res: Response, next: NextFunctio
     // Add profileId to the request object
     req.profileId = profileId;
 
-    console.log(`Request to ${req.path} using ProfileID: ${profileId}`);
+    //console.log(`Request to ${req.path} using ProfileID: ${profileId}`);
     next();
   } catch (error) {
     console.error('🚨 SECURITY: Profile middleware error:', error);

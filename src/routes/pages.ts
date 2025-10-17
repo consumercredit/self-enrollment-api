@@ -6,13 +6,11 @@ import { getProfileId } from '../middleware/profile-middleware';
 
 const router = Router();
 
-// Profile page endpoints
 router.post('/profile', async (req, res) => {
   const { firstName, lastName, zipCode, phone, consentToTexts } = req.body;
   try {
     const profileId = getProfileId(req);
     
-    // Use update_Profile stored procedure with ZipCode parameter (after you update the procedure)
     await db.raw(
       `EXEC update_Profile 
         @ProfileID = ?,
@@ -624,6 +622,7 @@ router.post('/income-01-01', async (req, res) => {
 
   try {
     const profileId = getProfileId(req);
+
     await db.raw(
       `EXEC update_Profile
         @ProfileID = ?,
@@ -892,30 +891,16 @@ router.post('/expenses-04-01', async (req, res) => {
 router.get('/expenses-06-01', async (req, res) => {
   try{
     const profileId = getProfileId(req);
-    console.log('🔍 expenses-06-01: Getting data for ProfileID:', profileId);
     
     const expenses = await db('Expenses').select('*').where({ ProfileID: profileId });
     const securedDebt = await db('SecuredDebt').select('*').where({ ProfileID: profileId });
     const unsecuredDebt = await db('UnsecuredDebt').select('*').where({ ProfileID: profileId });
-    
-    console.log('📊 Raw income query result for ProfileID:', profileId);
     const income = await db.raw(`EXEC get_TotalHouseholdNetIncome @ProfileID = ?`, [profileId]);
-    console.log('📊 Income stored procedure result:', income);
-    console.log('📊 Income[0]:', income[0]);
-    console.log('📊 TotalHouseholdNetIncome value:', income[0]?.TotalHouseholdNetIncome);
     
-    // Let's also check what income data exists
     const yourIncome = await db('YourIncome').select('*').where({ ProfileID: profileId });
     const partnerIncome = await db('YourPartnersIncome').select('*').where({ ProfileID: profileId });
     const savingsIncome = await db('YourSavingsIncome').select('*').where({ ProfileID: profileId });
     const otherIncome = await db('OtherIncome').select('*').where({ ProfileID: profileId });
-    
-    console.log('📊 Raw income data check:', {
-      yourIncome,
-      partnerIncome, 
-      savingsIncome,
-      otherIncome
-    });
     
     res.status(200).json({
       expenses, 

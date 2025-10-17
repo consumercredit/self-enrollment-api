@@ -964,14 +964,13 @@ router.get('/analysis-01-01', async (req, res) => {
 });
   
 router.post('/analysis-02-01', async (req, res) => {
-  const { Savings, Cash, RetirementAccounts, Stocks, Cryptocurrency, Bonds, LifeInsurance, MonthlySavingsContribution } = req.body;
+  const { CashSavings, RetirementAccounts, Stocks, Cryptocurrency, Bonds, LifeInsurance, MonthlySavingsContribution } = req.body;
   try{
     const profileId = getProfileId(req);
     await db.raw(`
       EXEC update_Savings 
       @ProfileID = ?,
-      @Savings = ?,
-      @Cash = ?,
+      @CashSavings = ?,
       @RetirementAccounts = ?,
       @Stocks = ?,
       @Cryptocurrency = ?,
@@ -980,8 +979,7 @@ router.post('/analysis-02-01', async (req, res) => {
       @MonthlySavingsContribution = ?`, 
       [
         profileId,
-        Savings, 
-        Cash,
+        CashSavings,
         RetirementAccounts,
         Stocks,
         Cryptocurrency,

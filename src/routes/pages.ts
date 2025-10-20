@@ -766,13 +766,15 @@ router.post('/expenses-02-01', async (req, res) => {
           @Section = ?, 
           @PayPeriodID = ?, 
           @Amount = ?,
-          @Comment = ?`,
+          @Comment = ?,
+          @IncludedInMortgage = ?`,
         [
           profileId,
           exp.Section,
           exp.PayPeriodID,
           exp.Amount,
-          exp.Comment
+          exp.Comment,
+          exp?.IncludedInMortgage ?? null
         ]
       );
     }

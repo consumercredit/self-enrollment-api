@@ -707,7 +707,7 @@ router.get('/income-02-01', async (req, res) => {
       .select('*')
       .where({ ProfileID: profileId });
     const totalgrossincome = await db.raw('EXEC get_TotalGrossMonthlyIncome @ProfileID = ?', [profileId]);
-    const totalnetincome = await db.raw('EXEC get_TotalHouseholdNetIncome @ProfileID = ?', [profileId]);
+    const totalnetincome = await db.raw('EXEC get_TotalHouseholdNetIncome_NoOtherIncome @ProfileID = ?', [profileId]);
     res.status(200).json({ 
       otherincome: otherincome,
       totalgrossincome: totalgrossincome[0].TotalGrossMonthlyIncome,

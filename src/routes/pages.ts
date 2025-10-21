@@ -220,12 +220,12 @@ router.get('/concerns-01-03', async (req, res) => {
 });
   
 router.post('/concerns-02-01', async (req, res) => {
-  const { NumberOfPeopleResponsibleFor, HasPartner } = req.body;
+  const { NumberOfPeopleResponsibleFor, HasPartner, JointBudget } = req.body;
   try {
     const profileId = getProfileId(req);
     await db.raw(
-      'EXEC update_Profile @ProfileID = ?, @NumberOfPeopleResponsibleFor = ?, @HasPartner = ?',
-      [profileId, NumberOfPeopleResponsibleFor, HasPartner]
+      'EXEC update_Profile @ProfileID = ?, @NumberOfPeopleResponsibleFor = ?, @HasPartner = ?, @JointBudget = ?',
+      [profileId, NumberOfPeopleResponsibleFor, HasPartner, JointBudget]
     );
     res.status(201).json({ success: true });
   } catch (err: any) {
@@ -238,7 +238,7 @@ router.get('/concerns-02-01', async (req, res) => {
   try {
     const profileId = getProfileId(req);
     const data = await db('Profile')
-      .select('NumberOfPeopleResponsibleFor', 'HasPartner')
+      .select('NumberOfPeopleResponsibleFor', 'HasPartner', 'JointBudget')
       .where({ ProfileID: profileId });
     res.status(200).json(data[0]);
   } catch (err: any) {
@@ -592,7 +592,7 @@ router.get('/income-01-01', async (req, res) => {
   try {
     const profileId = getProfileId(req);
     const profile = await db('Profile')
-      .select('DoYouHaveIncome', 'DoYouHaveSavings', 'HasPartner')
+      .select('DoYouHaveIncome', 'DoYouHaveSavings', 'JointBudget')
       .where({ ProfileID: profileId });
     const yourIncome = await db('YourIncome')
       .select('*')
@@ -614,7 +614,7 @@ router.post('/income-01-01', async (req, res) => {
   const {
     DoYouHaveIncome,
     DoYouHaveSavings,
-    HasPartner,
+    JointBudget,
     yourIncome,
     yourPartnersIncome,
     yourSavingsIncome
@@ -657,7 +657,7 @@ router.post('/income-01-01', async (req, res) => {
       );
     }
 
-    if (HasPartner) {
+    if (JointBudget) {
       await db.raw(
         `EXEC update_YourPartnersIncome 
         @ProfileID = ?,

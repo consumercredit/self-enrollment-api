@@ -1204,8 +1204,10 @@ router.post('/analysis-07-01', async (req, res) => {
     SaveHaircuts,
     DitchGym,
     ShopSecondhand
-  } = req.body;  
+  } = req.body;
+
   try{
+    const profileId = getProfileId(req);
     await db.raw(`
       EXEC update_WaysToTrimBudget 
         @ProfileID = ?,
@@ -1223,7 +1225,7 @@ router.post('/analysis-07-01', async (req, res) => {
         @ShopSecondhand = ?
     `, 
     [
-      1,
+      profileId,
       CookAtHome,
       PackLunch,
       BatchCook,
@@ -1309,6 +1311,7 @@ router.post('/analysis-07-02', async (req, res) => {
   } = req.body;
 
   try {
+    const profileId = getProfileId(req);
     await db.raw(`
       EXEC update_WaysToTrimBudget 
         @ProfileID = ?,
@@ -1323,7 +1326,7 @@ router.post('/analysis-07-02', async (req, res) => {
         @CompareHomeInsurance = ?,
         @UseUtilityAssistance = ?
     `, [
-      1,
+      profileId,
       RefinanceMortgage,
       IncreaseDeductibles,
       GetRoommate,

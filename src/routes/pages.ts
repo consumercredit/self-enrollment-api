@@ -1223,7 +1223,7 @@ router.post('/analysis-07-01', async (req, res) => {
         @SaveHaircuts = ?,
         @DitchGym = ?,
         @ShopSecondhand = ?
-    `, 
+      `,
     [
       profileId,
       CookAtHome,

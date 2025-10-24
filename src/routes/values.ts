@@ -51,7 +51,18 @@ router.get('/SurplusOrDeficit', async (req, res) => {
 router.get('/TotalHouseholdNetIncome', async (req, res) => {
   try{
     const profileId = getProfileId(req);
-    const data = await db.raw(`EXEC get_TotalHouseholdNetIncome @ProfileID = ?`, [profileId]);
+    const data = await db.raw(`EXEC get_TotalHouseholdNetIncome_Monthly @ProfileID = ?`, [profileId]);
+    res.status(200).json(data[0].TotalHouseholdNetIncome);
+  }catch(err: any){
+    console.error(err);
+    res.status(500).json({ error: 'Database error', details: err.message });
+  }
+});
+
+router.get('/TotalHouseholdNetIncome_Yearly', async (req, res) => {
+  try{
+    const profileId = getProfileId(req);
+    const data = await db.raw(`EXEC get_TotalHouseholdNetIncome_Yearly @ProfileID = ?`, [profileId]);
     res.status(200).json(data[0].TotalHouseholdNetIncome);
   }catch(err: any){
     console.error(err);

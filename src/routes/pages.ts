@@ -706,12 +706,17 @@ router.get('/income-02-01', async (req, res) => {
     const otherincome = await db('OtherIncome')
       .select('*')
       .where({ ProfileID: profileId });
-    const totalgrossincome = await db.raw('EXEC get_TotalGrossMonthlyIncome @ProfileID = ?', [profileId]);
-    const totalnetincome = await db.raw('EXEC get_TotalHouseholdNetIncome_NoOtherIncome @ProfileID = ?', [profileId]);
+    const totalgrossincome_monthly = await db.raw('EXEC get_TotalGrossMonthlyIncome_Monthly @ProfileID = ?', [profileId]);
+    const totalgrossincome_yearly = await db.raw('EXEC get_TotalGrossMonthlyIncome_Yearly @ProfileID = ?', [profileId]);
+
+    const totalnetincome_monthly = await db.raw('EXEC get_TotalHouseholdNetIncome_NoOtherIncome_Monthly @ProfileID = ?', [profileId]);
+    const totalnetincome_yearly = await db.raw('EXEC get_TotalHouseholdNetIncome_NoOtherIncome_Yearly @ProfileID = ?', [profileId]);
     res.status(200).json({ 
       otherincome: otherincome,
-      totalgrossincome: totalgrossincome[0].TotalGrossMonthlyIncome,
-      totalnetincome: totalnetincome[0].TotalHouseholdNetIncome
+      totalgrossincome_monthly: totalgrossincome_monthly[0].TotalGrossMonthlyIncome,
+      totalgrossincome_yearly: totalgrossincome_yearly[0].TotalGrossYearlyIncome,
+      totalnetincome_monthly: totalnetincome_monthly[0].TotalHouseholdNetIncome,
+      totalnetincome_yearly: totalnetincome_yearly[0].TotalHouseholdNetIncome
     });
   } catch (err: any) {
     console.error(err);
@@ -897,7 +902,7 @@ router.get('/expenses-06-01', async (req, res) => {
     const expenses = await db('Expenses').select('*').where({ ProfileID: profileId });
     const securedDebt = await db('SecuredDebt').select('*').where({ ProfileID: profileId });
     const unsecuredDebt = await db('UnsecuredDebt').select('*').where({ ProfileID: profileId });
-    const income = await db.raw(`EXEC get_TotalHouseholdNetIncome @ProfileID = ?`, [profileId]);
+    const income = await db.raw(`EXEC get_TotalHouseholdNetIncome_Monthly @ProfileID = ?`, [profileId]);
     
     const yourIncome = await db('YourIncome').select('*').where({ ProfileID: profileId });
     const partnerIncome = await db('YourPartnersIncome').select('*').where({ ProfileID: profileId });
@@ -1013,7 +1018,7 @@ router.get('/analysis-02-01', async (req, res) => {
 router.get('/analysis-04-01', async (req, res) => {
   try{
     const profileId = getProfileId(req);
-    const GrossMonthlyIncome = await db.raw(`EXEC get_TotalGrossMonthlyIncome @ProfileID = ?`, [profileId]);
+    const GrossMonthlyIncome = await db.raw(`EXEC get_TotalGrossMonthlyIncome_Monthly @ProfileID = ?`, [profileId]);
     const RecurringMonthlyDebt = await db.raw(`EXEC get_RecurringMonthlyDebt @ProfileID = ?`, [profileId]);
     const TotalCreditLimit = await db.raw(`EXEC get_TotalCreditLimit @ProfileID = ?`, [profileId]);
     const TotalUnsecuredBalance = await db.raw(`EXEC get_TotalUnsecuredBalance @ProfileID = ?`, [profileId]);
